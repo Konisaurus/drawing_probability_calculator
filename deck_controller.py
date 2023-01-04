@@ -27,6 +27,9 @@ class Card_Pool:
     def get_card_count(self):
         return self.card_count
 
+    def get_card_names(self):
+        return self.card_names
+
 class Deck_Controller:
     # class for managing different card pools that are in one deck
     def __init__(self, main_dict):
@@ -51,7 +54,7 @@ class Deck_Controller:
                 unassigned_card_count -= pool.get_card_count()
         return unassigned_card_count
 
-    def add_card_pools(self, card_pools):
+    def create_card_pools(self, card_pools):
         # add a list of pools to to the Deck_Controller
         self.defined_card_pools.extend(card_pools)
         self.unassigned_card_count = self.calculate_unassigned_cards()  # update unassinged_card_count

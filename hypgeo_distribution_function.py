@@ -1,6 +1,5 @@
 from itertools import product
 from deck_controller import *
-# import PYQT5
 
 def faculty(n):
     # calculate faculty of n
@@ -25,7 +24,7 @@ def binomial_coefficient(n, k):
         return int(dividend / divisor)
 
 
-def advanced_hypgeo_cdf(deck, sample_size = 0):
+def hypgeo_cdf(deck, sample_size = 0):
     # calculate probability of drawing a certain sample of cards from a deck
     # probability P(A ==/>= a, B ==/>= b, C ==/>= c, D ==/>= d, E ==/>= e, F ==/>= f)
     
@@ -81,9 +80,14 @@ def format_float(percentage, decimals, value):
         value *= 100
     return float("%.{}f".format(decimals) % value)
 
-main = {'Kashtira Fenrir': 3, 'Mudan the Rikka Fairy': 1, 'Traptrix Myrmeleo': 3, 'Traptrix Mantis': 2, 'Traptrix Dionaea': 1, 'Traptrix Vesiculo': 1, 'Traptrix Arachnocampa': 1, 'Traptrix Pudica': 1, 'Primula the Rikka Fairy': 1, 'Rikka Princess': 3, 'Rikka Glamour': 3, 'Rikka Konkon': 2, 'Traptrix Orchard': 1, 'Called by the Grave': 1, 'Time-Space Trap Hole': 1, 'Delusion Trap Hole': 1, 'Bottomless Trap Hole': 1, 'Infinite Impermanence': 3, "Ice Dragon's Prison": 2, 'Rikka Sheet': 2, 'Traptrix Holetaea': 3, 'The Phantom Knights of Shade Brigandine': 3}
+# this is only for testing
+main = {'Kashtira Fenrir': 3, 'Mudan the Rikka Fairy': 1, 'Traptrix Myrmeleo': 3, 'Traptrix Mantis': 2, 'Traptrix Dionaea': 1, \
+        'Traptrix Vesiculo': 1, 'Traptrix Arachnocampa': 1, 'Traptrix Pudica': 1, 'Primula the Rikka Fairy': 1, 'Rikka Princess': 3, \
+        'Rikka Glamour': 3, 'Rikka Konkon': 2, 'Traptrix Orchard': 1, 'Called by the Grave': 1, 'Time-Space Trap Hole': 1, \
+        'Delusion Trap Hole': 1, 'Bottomless Trap Hole': 1, 'Infinite Impermanence': 3, "Ice Dragon's Prison": 2, \
+        'Rikka Sheet': 2, 'Traptrix Holetaea': 3, 'The Phantom Knights of Shade Brigandine': 3}
 
 deck = Deck_Controller(main)
-deck.add_card_pools([Card_Pool(['Kashtira Fenrir'], deck.get_main_dict(), 1, False), Card_Pool(['Traptrix Myrmeleo', 'Traptrix Mantis'], deck.get_main_dict(), 1, False)])
+deck.create_card_pools([Card_Pool(['Kashtira Fenrir'], deck.get_main_dict(), 1, False), Card_Pool(['Traptrix Myrmeleo', 'Traptrix Mantis'], deck.get_main_dict(), 1, False)])
 
-print(format_float(True, 3, advanced_hypgeo_cdf(deck)))
+print(format_float(True, 3, hypgeo_cdf(deck, 5)))
