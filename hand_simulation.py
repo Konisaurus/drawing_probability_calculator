@@ -3,7 +3,7 @@ from deck_controller import *
 import copy
 
 def convert_dict_to_list(old_dict):
-    # create a list with all keys from a dictionary
+    # create a list with all keys from a dictionary and return it.
     # Each key is added to the list as many times as its associated value.
     new_list = []
     for key in old_dict:
@@ -14,7 +14,7 @@ def convert_dict_to_list(old_dict):
 
 
 def create_counting_list(deck):
-    # for every pool in the deck, one counting variable (zero) gets added to a counting list
+    # for every pool in the deck, one counting variable (zero) gets added to a counting list.
     card_pools = deck.get_card_pools()
     counting_list = []
     for i in range(len(card_pools)):
@@ -29,18 +29,18 @@ def sample_simulation(deck, iterations, sample_size):
     # a sample is a success, when at least one card from each pool (Deck_Controller) is drawn.
     success = 0
 
-    # get all values from the Deck_Controller
+    # get all values from the Deck_Controller.
     card_pools = deck.get_card_pools()
     base_counting_list = create_counting_list(deck)
     card_list = convert_dict_to_list(deck.get_main_dict())
 
     # loop for the iterations
     for i in range(iterations):
-        # every loop needs a new counting list and sample
+        # every loop needs a new counting list and sample.
         counting_list = copy.copy(base_counting_list)
         card_sample = random.sample(card_list, sample_size)
 
-        # check if the cards from the sample are in a pool
+        # check if the cards from the sample are in a pool.
         for card in card_sample: 
             for pool in card_pools:
                 index = card_pools.index(pool)

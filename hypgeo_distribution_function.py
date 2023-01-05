@@ -1,8 +1,9 @@
 from itertools import product
 from deck_controller import *
 
+
 def faculty(n):
-    # calculate faculty of n
+    # calculate faculty of n and return it.
     n_fak = 1
     if n != 0:
         for i in range(2,n+1):
@@ -11,7 +12,7 @@ def faculty(n):
 
 
 def binomial_coefficient(n, k):
-    # calculates the binomial coefficient
+    # calculates the binomial coefficient and return it.
     # n = set
     # k = draws
     if 0 <= k <= n:
@@ -25,18 +26,18 @@ def binomial_coefficient(n, k):
 
 
 def hypgeo_cdf(deck, sample_size = 0):
-    # calculate probability of drawing a certain sample of cards from a deck
+    # calculate probability of drawing a certain sample of cards from a deck and return it.
     # probability P(A ==/>= a, B ==/>= b, C ==/>= c, D ==/>= d, E ==/>= e, F ==/>= f)
     
-    # pass the sample_size to the Deck_Controller
+    # pass the sample_size to the Deck_Controller.
     deck.set_sample_size(sample_size)
-    # get a list with all possible slot sizes of each pool (also lists)
+    # get a list with all possible slot sizes of each pool (also lists).
     slot_sizes = deck.get_pool_slot_sizes()
     
     # find all possible configurations of the sample hand.
     # Requirements for one successfull configuration:
-    # - every slot must be in the configuration (a size of a slot can be 0)
-    # - all slot sizes added up must not exceed the sample_size
+    # - Every slot must be in the configuration (a size of a slot can be 0).
+    # - All slot sizes added up must not exceed the sample_size.
     # The binomial_coefficient of each slot is stored in one configuration.
     # All configurations are stored in the configuration_table.
     configuration_table = []
@@ -58,8 +59,8 @@ def hypgeo_cdf(deck, sample_size = 0):
     # all possible samples (successes and failures)
     divisor = binomial_coefficient(deck.get_deck_size(), sample_size)
 
-    # calculate the hypergeometric probability distribution function for each configuration
-    # The hypgeo pdf of all configurations added up equals the hypgeo cumulative distribution function
+    # calculate the hypergeometric probability distribution function for each configuration.
+    # The hypgeo pdf of all configurations added up equals the hypgeo cumulative distribution function.
     dividend = 0
     for configuration in configuration_table:
         temp_factor = 1
@@ -72,7 +73,7 @@ def hypgeo_cdf(deck, sample_size = 0):
 
 
 def format_float(percentage, decimals, value):
-    # formating method for floats
+    # formating method for floats, returns the newly formated float.
     # percentage: True = multiply float by 100, False = do nothing
     # decimals: number of decimals after the comma
     # value: float you want to format
