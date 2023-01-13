@@ -70,15 +70,12 @@ class Deck_Controller:
     def check_unassigned_cards(self):
         # creates/updates the list of unassigned card names
         unassigned_cards = copy.deepcopy(self.main_dict)
-
         if self.defined_card_pools != []:
             for pool in self.defined_card_pools:
                 if pool.get_card_names() != []:
                     for card in pool.get_card_names():
                         unassigned_cards.pop(card)
-
         return unassigned_cards
-
 
     def create_card_pools(self, card_pools):
         # add a list of card_pools to to the Deck_Controller.
