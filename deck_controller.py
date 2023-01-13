@@ -1,3 +1,5 @@
+import copy
+
 class Card_Pool:
     # class for different cards that can be treated as one unit (each card is the "same").
     def __init__ (self, name_list, main_dict, min_slot_size = 1, boolean = True):
@@ -21,10 +23,17 @@ class Card_Pool:
     def create_size_list(self, sample_size):
         # create list of all possible sizes of a slot that is occupied by cards of this pool.
         # The smallest size is determined by self.min_slot_size, the maximum by min(self.card_count, sample_size).
+        self.size_list = []
         if self.only_equal == True:
             self.size_list = self.min_slot_size
         else:
             self.size_list =  list(range(self.min_slot_size, min(self.card_count, sample_size) + 1))
+
+    def add_card(self, card_name, main_dict, sample_size):
+        # adds a card to the pool
+        self.card_names.append(card_name)
+        self.card_count = self.addup_cards(main_dict)
+        self.create_size_list(sample_size)
 
     # getter functions
     def get_card_count(self):
@@ -40,6 +49,7 @@ class Deck_Controller:
         self.deck_size = self.calculate_deck_size()                     # number of card copies in deck
         self.defined_card_pools = []                                    # list of different card pools
         self.unassigned_card_count = self.calculate_unassigned_cards()  # number of card copies that are not assigned to any pool
+        self.unassigned_cards = self.check_unassigned_cards()           # dict of cards that are in no card pool
         self.sample_size = 0                                            # number of cards that are drawn in a sample hand
     
     def calculate_deck_size(self):
@@ -57,10 +67,30 @@ class Deck_Controller:
                 unassigned_card_count -= pool.get_card_count()
         return unassigned_card_count
 
+    def check_unassigned_cards(self):
+        # creates/updates the list of unassigned card names
+        unassigned_cards = copy.deepcopy(self.main_dict)
+
+        if self.defined_card_pools != []:
+            for pool in self.defined_card_pools:
+                if pool.get_card_names() != []:
+                    for card in pool.get_card_names():
+                        unassigned_cards.pop(card)
+
+        return unassigned_cards
+
+
     def create_card_pools(self, card_pools):
         # add a list of card_pools to to the Deck_Controller.
         self.defined_card_pools.extend(card_pools)
         self.unassigned_card_count = self.calculate_unassigned_cards()  # update unassinged_card_count
+        self.unassigned_cards = self.check_unassigned_cards()
+
+    def add_card_to_pool(self, pool_index, card_name):
+        # adds a card_name to a card pool
+        self.defined_card_pools[pool_index].add_card(card_name, self.main_dict, self.sample_size)
+        self.unassigned_card_count = self.calculate_unassigned_cards() 
+        self.unassigned_cards = self.check_unassigned_cards()       
 
     def set_sample_size(self, sample_size):
         # set number of cards (sample_size) that are drawn in a sample hand.
