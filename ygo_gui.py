@@ -14,13 +14,15 @@ from gui_classes import *
 # Entry 	                ent 
 # Text 	                    txt 
 # Frame 	                frm 
+# Canvas                    cnv
+# Scrollbar                 scb
 # Changeable_OptionMenu     drp
 
 ##############################################################################################################################
 
 # create main window
 window = tk.Tk()
-
+window.geometry("800x500")
 window.resizable(False, False)
 window.title("YGO Hand Master")
 
@@ -29,14 +31,11 @@ window.title("YGO Hand Master")
 # create a top, middle and bottom frame 
 # top frame:    managing deck, initialize calculation
 # middle frame: managing pools
-# bottom frame: display calculation results
 frm_top = tk.Frame(master=window, borderwidth=5)
 frm_middle = tk.Frame(master=window, borderwidth=5)
-frm_bottom = tk.Frame(master=window, borderwidth=5)
 
 frm_top.pack()
 frm_middle.pack()
-frm_bottom.pack()
 
 ##############################################################################################################################
 
@@ -47,7 +46,7 @@ frm_deck_selection = tk.Frame(master=frm_top, relief=tk.RIDGE, borderwidth=5)
 frm_deck_selection.grid(row=0, column=0, padx=5, pady=5)
 
 # labels
-lbl_deck_selection = tk.Label(master=frm_deck_selection, text="Deck Selection", height=1, font=("Helvetica", "9", "bold"))
+lbl_deck_selection = tk.Label(master=frm_deck_selection, text="Deck Selection", height=1, font=("Helvetica", "11", "bold"))
 lbl_deck_import = tk.Label(master=frm_deck_selection, text="Deck path:", height=1, width=15, anchor="w")
 lbl_stored_deck = tk.Label(master=frm_deck_selection, text="Stored decks:", height=1, width=15, anchor="w")
 
@@ -95,11 +94,11 @@ frm_calculation = tk.Frame(master=frm_top, relief=tk.RIDGE, borderwidth=5)
 frm_calculation.grid(row=0, column=1, padx=5, pady=5)
 
 # labels
-lbl_initialize_calculation = tk.Label(master=frm_calculation, text="Initialize Calculation", height=1, font=("Helvetica", "9", "bold"))
+lbl_initialize_calculation = tk.Label(master=frm_calculation, text="Initialize Calculation", height=1, font=("Helvetica", "11", "bold"))
 lbl_sample_size = tk.Label(master=frm_calculation, text="Sample size:", height=1, width=15, anchor="w")
 
 # entries
-ent_sample_size = tk.Entry(master=frm_calculation, width=5)
+ent_sample_size = tk.Entry(master=frm_calculation, width=12)
 
 # start calculation
 def start_calculation():
@@ -133,10 +132,7 @@ btn_calculate.grid(row=2, column=1, padx=10, pady=4, sticky="e")
 
 # only for testing
 pool1 = Display_Card_Pool(frm_middle)
-pool1.frame.grid(row=1, column=0, padx=5, pady=5, sticky="w")
-
-pool2 = Display_Card_Pool(frm_middle)
-pool2.frame.grid(row=1, column=1, padx=5, pady=5, sticky="w")
+pool1.frame.grid(row=0, column=0, padx=5, pady=5, sticky="nw")
 
 ##############################################################################################################################
 
