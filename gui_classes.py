@@ -27,10 +27,9 @@ class Changeable_OptionMenu():
     def delete_item(self):
         # deletes the selected item from the option list
         item = self.variable.get()
-        if item in self.options and not item ==  self.unremovable_option:
+        if item in self.options and not item == self.unremovable_option:
             self.options.remove(item)
             self.update_options()
-        if self.options != []:
             self.variable.set(self.unremovable_option)
 
     def get_OptionMenu_class(self):
@@ -40,6 +39,25 @@ class Changeable_OptionMenu():
 
 class Display_Card_Pool():
     # display a card pool
-    # still needs to be implemented
-    def __init__(self, name_list):
-        self.card_names = name_list
+    # not fully funtional
+    def __init__(self, master):
+        self.frame = tk.Frame(master=master, relief=tk.RIDGE, borderwidth=5)
+        self.card_names = ["Card name"]
+        self.card_display = self.create_card_display()
+        self.card_display.pack(padx=5, pady=5)
+
+
+    def create_card_display(self):
+        display_frame = tk.Frame(master=self.frame, relief=tk.RIDGE, borderwidth=5)
+        
+        for index in range(len(self.card_names)):
+            label = tk.Label(
+                master=display_frame, 
+                text=self.card_names[index],
+                width=48,
+                height=1, 
+                anchor="w"
+                            )
+            label.grid(row=index, column=0, padx=1, pady=1, sticky="w")
+        return display_frame
+
