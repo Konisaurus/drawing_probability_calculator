@@ -1,10 +1,37 @@
 import copy
 
+
+class Deck:
+    # class for storing deck info (optimized for Yu-Gi-Oh!)
+    def __init__(self, deck_name, main_deck, extra_deck, side_deck):
+        # dictionaries of all deck parts
+        self.name = deck_name
+        self.main = main_deck
+        self.extra = extra_deck
+        self.side = side_deck
+
+        # getter functions
+        def get_name(self):
+            return self.name
+        
+        def get_main(self):
+            return self.main
+
+        def get_extra(self):
+            return self.extra
+
+        def get_side(self):
+            return self.side
+
+
 class Card_Pool:
     # class for different cards that can be treated as one unit (each card is the "same").
     def __init__ (self, name_list, main_dict, min_slot_size = 1, boolean = True):
+        # card info for pool
         self.card_names = name_list                     # store all card names that are in the pool.
         self.card_count = self.addup_cards(main_dict)   # number of card copies in the pool.
+
+        # info for calculations
         self.min_slot_size = min_slot_size              # how many cards of this pool should be at least in a successfull sample.
         self.only_equal = boolean                       # True (only == 1 is a success), False (everything >= 1 is a success)
         self.size_list = []                             # list of all possible sizes of a slot that is occupied by cards of this pool (also depends on sample size).
@@ -42,14 +69,19 @@ class Card_Pool:
     def get_card_names(self):
         return self.card_names
 
+
 class Deck_Controller:
     # class for managing different card pools that are in one deck.
-    def __init__(self, main_dict):
-        self.main_dict = main_dict                                      # main deck as a dictionary, main_dict = {"card1": int(number of card1 in deck), ... , "cardX": int(number of cardX in deck)}
+    def __init__(self, deck):
+        # these attributes should always stay the same
+        self.deck = deck                                                # entire deck info (class Deck)
+        self.main_dict = self.deck.main                                 # main deck as a dictionary, main_dict = {"card1": int(number of card1 in deck), ... , "cardX": int(number of cardX in deck)}
         self.deck_size = self.calculate_deck_size()                     # number of card copies in deck
+
+        # can be changed
         self.defined_card_pools = []                                    # list of different card pools
-        self.unassigned_card_count = self.calculate_unassigned_cards()  # number of card copies that are not assigned to any pool
         self.unassigned_cards = self.check_unassigned_cards()           # dict of cards that are in no card pool
+        self.unassigned_card_count = self.calculate_unassigned_cards()  # number of card copies that are not assigned to any pool
         self.sample_size = 0                                            # number of cards that are drawn in a sample hand
     
     def calculate_deck_size(self):

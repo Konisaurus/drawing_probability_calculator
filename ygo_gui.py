@@ -22,8 +22,8 @@ from gui_classes import *
 
 # create main window
 window = tk.Tk()
-window.geometry("800x500")
-window.resizable(False, False)
+window.geometry("830x500")
+window.resizable(False, True)
 window.title("YGO Hand Master")
 
 ##############################################################################################################################
@@ -32,9 +32,9 @@ window.title("YGO Hand Master")
 # top frame:    managing deck, initialize calculation
 # middle frame: managing pools
 frm_top = tk.Frame(master=window, borderwidth=5)
-frm_middle = tk.Frame(master=window, borderwidth=5)
+frm_top.pack(anchor="nw")
 
-frm_top.pack()
+frm_middle = Scrollable_Frame(master=window)
 frm_middle.pack()
 
 ##############################################################################################################################
@@ -54,7 +54,7 @@ lbl_stored_deck = tk.Label(master=frm_deck_selection, text="Stored decks:", heig
 ent_deck_import = tk.Entry(master=frm_deck_selection, width=50)
 
 # create the decklist dropdown menu
-drp_stored_deck = Changeable_OptionMenu(frm_deck_selection, "test deck", [], "Select Deck")
+drp_stored_deck = Changeable_OptionMenu(frm_deck_selection, "Select deck.", [], 42)
 
 # adds a deck to the dropdown menu
 def handle_deck_import():
@@ -110,8 +110,17 @@ def start_calculation():
         pass
     
 # add pool
+pool_list = []
 def add_pool():
-    pass
+    pool_count = len(pool_list)
+    if (pool_count % 2) == 0:
+        pool = Display_Card_Pool(frm_middle.get_frame())
+        pool.get_frame().grid(row=(pool_count // 2), column=0, padx=5, pady=5, sticky="nw")
+
+    else:
+        pool = Display_Card_Pool(frm_middle.get_frame())
+        pool.get_frame().grid(row=(pool_count // 2), column=1, padx=5, pady=5, sticky="nw")
+    pool_list.append(pool)
 
 # buttons
 btn_add_pool = tk.Button(master=frm_calculation, text="+ POOL", command=add_pool)
@@ -131,8 +140,8 @@ btn_calculate.grid(row=2, column=1, padx=10, pady=4, sticky="e")
 # pool management
 
 # only for testing
-pool1 = Display_Card_Pool(frm_middle)
-pool1.frame.grid(row=0, column=0, padx=5, pady=5, sticky="nw")
+
+
 
 ##############################################################################################################################
 
