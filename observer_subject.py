@@ -11,6 +11,6 @@ class Subject():
     def attach(self, observer):
         self._observers.add(observer)
 
-    def notify(self, update_event):
+    def notify(self, update_event, *args):
         for observer in self._observers:
-            observer.update(update_event)
+            observer.update(update_event, *args)

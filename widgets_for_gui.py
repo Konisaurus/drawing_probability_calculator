@@ -1,6 +1,6 @@
 import tkinter as tk
 
-
+        
 class Changeable_OptionMenu():
     # an tk.OptionMenu that has a list which can be changed
     def __init__(self, master, dropdown_title, option_list, width):
@@ -24,9 +24,8 @@ class Changeable_OptionMenu():
         self.options.append(str(item))
         self._update_options()
 
-    def delete_item(self):
+    def delete_item(self, item):
         # deletes the selected item from the option list
-        item = self.variable.get()
         if item in self.options and not item == self.unremovable_option:
             self.options.remove(item)
             self._update_options()
@@ -35,6 +34,9 @@ class Changeable_OptionMenu():
     def get_OptionMenu_class(self):
         # get the OptionMenu, which is the core of this class
         return self.dropdown
+    
+    def get_variable(self):
+        return self.variable.get()
 
 
 class Scrollable_Frame():

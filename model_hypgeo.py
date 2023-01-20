@@ -9,6 +9,18 @@ class Model_Hypgeo(Subject):
         Subject.__init__(self)
         self.deck_manager = None
 
+        # marked section is only for testing
+        # will be deleted after everything is done correctly
+        ###########################################################################################################################################
+        deck = Deck("Traptrix-Rikka", 
+            {'Kashtira Fenrir': 3, 'Mudan the Rikka Fairy': 1, 'Traptrix Myrmeleo': 3, 'Traptrix Mantis': 2, 'Traptrix Dionaea': 1, \
+            'Traptrix Vesiculo': 1, 'Traptrix Arachnocampa': 1, 'Traptrix Pudica': 1, 'Primula the Rikka Fairy': 1, 'Rikka Princess': 3, \
+            'Rikka Glamour': 3, 'Rikka Konkon': 2, 'Traptrix Orchard': 1, 'Called by the Grave': 1, 'Time-Space Trap Hole': 1, \
+            'Delusion Trap Hole': 1, 'Bottomless Trap Hole': 1, 'Infinite Impermanence': 3, "Ice Dragon's Prison": 2, \
+            'Rikka Sheet': 2, 'Traptrix Holetaea': 3, 'The Phantom Knights of Shade Brigandine': 3})
+        self.set_deck_manager(deck)
+        ###########################################################################################################################################
+
     def calculate(self):
         # find all possible configurations of the sample hand.
         # Requirements for one successfull configuration:
@@ -16,6 +28,7 @@ class Model_Hypgeo(Subject):
         # - All slot sizes added up must not exceed the sample_size.
         # The binomial_coefficient of each slot is stored in one configuration.
         # All configurations are stored in the configuration_table.
+        self.notify("start calculate")
         if self.deck_manager != None:
             slot_sizes = self.deck_manager.get_pool_slot_sizes()
             configuration_table = []
@@ -52,7 +65,7 @@ class Model_Hypgeo(Subject):
             return hypgeo_cdf
 
     def set_deck_manager(self, deck):
-        self.deck_manager = Deck_Manager(deck)
+        self.deck_manager = Deck_Manager(self, deck)
 
     # getter functions
     def get_deck_manager(self):
@@ -61,26 +74,24 @@ class Model_Hypgeo(Subject):
 
 # for testing the model class
 if __name__ == "__main__":
-    hypgeo = Model_Hypgeo()
     deck = Deck("Traptrix-Rikka", 
             {'Kashtira Fenrir': 3, 'Mudan the Rikka Fairy': 1, 'Traptrix Myrmeleo': 3, 'Traptrix Mantis': 2, 'Traptrix Dionaea': 1, \
             'Traptrix Vesiculo': 1, 'Traptrix Arachnocampa': 1, 'Traptrix Pudica': 1, 'Primula the Rikka Fairy': 1, 'Rikka Princess': 3, \
             'Rikka Glamour': 3, 'Rikka Konkon': 2, 'Traptrix Orchard': 1, 'Called by the Grave': 1, 'Time-Space Trap Hole': 1, \
             'Delusion Trap Hole': 1, 'Bottomless Trap Hole': 1, 'Infinite Impermanence': 3, "Ice Dragon's Prison": 2, \
             'Rikka Sheet': 2, 'Traptrix Holetaea': 3, 'The Phantom Knights of Shade Brigandine': 3})
-
+        
+    hypgeo = Model_Hypgeo()
+    
     hypgeo.set_deck_manager(deck)
     hypgeo.get_deck_manager().set_sample_size(5)
+
     hypgeo.get_deck_manager().add_card_pool()
     hypgeo.get_deck_manager().add_card_to_pool(0, 'Kashtira Fenrir')
     hypgeo.get_deck_manager().set_pool_slot_size(0, 1)
-    hypgeo.get_deck_manager().set_pool_only_equal(0, True)
+    hypgeo.get_deck_manager().set_pool_only_equal(0, False)
 
     hypgeo.get_deck_manager().add_card_pool()
-    hypgeo.get_deck_manager().add_card_to_pool(1, 'Traptrix Myrmeleo')
-    hypgeo.get_deck_manager().add_card_to_pool(1, 'Traptrix Mantis')
-    hypgeo.get_deck_manager().set_pool_slot_size(1, 1)
-    hypgeo.get_deck_manager().set_pool_only_equal(1, False)
-    
+    hypgeo.get_deck_manager().set_pool_slot_size(1, 0)
 
     print(hypgeo.calculate())
