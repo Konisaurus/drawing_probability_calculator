@@ -1,8 +1,13 @@
+'''
+NOT FULLY IMPLEMENTED YET
+'''
+
+# Import.
 import random
 import copy
 from classes_for_model import *
 
-
+# Mehtods
 def convert_dict_to_list(old_dict):
     # create a list with all keys from a dictionary and return it.
     # Each key is added to the list as many times as its associated value.
@@ -16,7 +21,7 @@ def convert_dict_to_list(old_dict):
 
 def create_counting_list(deck):
     # for every pool in the deck, one counting variable (zero) gets added to a counting list.
-    card_pools = deck.get_card_pools()
+    card_pools = deck.get_pools()
     counting_list = []
     for i in range(len(card_pools)):
         counting_list.append(0)
@@ -31,7 +36,7 @@ def sample_simulation(deck, iterations, sample_size):
     success = 0
 
     # get all values from the Deck_Controller.
-    card_pools = deck.get_card_pools()
+    card_pools = deck.get_pools()
     base_counting_list = create_counting_list(deck)
     card_list = convert_dict_to_list(deck.get_main_dict())
 

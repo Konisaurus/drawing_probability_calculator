@@ -1,10 +1,14 @@
+'''
+This module contains the View class which contains all the visual aspects of the system.
+'''
+
+# Imports
 import tkinter as tk
 from widgets_for_gui import *
 from observer_subject import Observer
 from model_hypgeo import *
 
-
-# name convetions:
+# Name convetions for all tkinter widgets:
 #
 # Label 	                lbl 
 # Button 	                btn 
@@ -13,50 +17,49 @@ from model_hypgeo import *
 # Frame 	                frm 
 # Canvas                    cnv
 # Scrollbar                 scb
-# Changeable_OptionMenu     drp
+# Changeable_OptionMenu     drp (short for dropdown)
 
-
-class Card_Pool_Section:
-    # display a card pool
+# Classes.
+class Pool_Section:
+    '''
+    Class for displaying one pool.
+    '''
     def __init__(self, view, index = 0):
         
-        # master window
-        self.view = view
-        self.index = index
+        # Associated place.
+        self.view = view        # Master window.
+        self.index = index      # Index where this pool in the pool_list of the master window is stored.
 
-        # frame for the card pool display
+        # Frame for the card pool display.
         self.frame = tk.Frame(master=self.view.get_frm_bottom(), relief=tk.RIDGE, borderwidth=5, width=30)
 
-        # title of the frame
-        lbl_title = tk.Label(master=self.frame, text="Card Pool", height=1, font=("Helvetica", "11", "bold"), anchor="nw")
-        
-        # display all cards in the pool
+        # Display all cards in the pool.
         self.card_names = []
         self.lbl_card_display = tk.Label(master=self.frame, text="text", width=50, anchor="nw", justify="left")
-        self.update_card_display_text()
+        self.set_card_display_text()
 
-        # labels
+        # Labels.
+        lbl_title = tk.Label(master=self.frame, text="Card Pool", height=1, font=("Helvetica", "11", "bold"), anchor="nw")
         lbl_add_card = tk.Label(master=self.frame, text="Add card:", anchor="nw")
         lbl_del_card = tk.Label(master=self.frame, text="Delete card:", anchor="nw")
         self.lbl_size = tk.Label(master=self.frame, text="Minimum pool size:", anchor="nw", width=15)
 
-        # dropdownlists
+        # Dropdownlists.
         self.drp_add_card = Changeable_OptionMenu(self.frame, "Select card.", self.view.get_model().get_deck_manager().get_unassigned_cards(), 22)
         self.drp_del_card = Changeable_OptionMenu(self.frame, "Select card.", [], 22)
 
-        # buttons
+        # Buttons.
         self.btn_add_card = tk.Button(master=self.frame, text="+ CARD", command= lambda: self.view.get_controller().on_add_card(self.index, self.drp_add_card.get_variable()))
         self.btn_del_card = tk.Button(master=self.frame, text="- CARD", command= lambda: self.view.get_controller().on_del_card(self.index, self.drp_del_card.get_variable()))
         self.btn_change_type = tk.Button(master=self.frame, text="CHANGE", command= lambda: self.view.get_controller().on_change_type(self.index))
 
-        # entries
+        # Entries.
         self.ent_min_size = tk.Entry(master=self.frame, width=29)
 
-        # arrange everything
-        lbl_title.grid(row=0, column=0, padx=1, pady=10, sticky="w")
-
+        # Arrange everything.
         self.lbl_card_display.grid(row=1, column=0, columnspan=3, padx=5, pady=5, sticky="nw")
 
+        lbl_title.grid(row=0, column=0, padx=1, pady=10, sticky="w")
         lbl_add_card.grid(row=2, column=0, padx=5, pady=5, sticky="w")
         lbl_del_card.grid(row=3, column=0, padx=5, pady=5, sticky="w")
         self.lbl_size.grid(row=4, column=0, padx=5, pady=5, sticky="w")
@@ -70,34 +73,53 @@ class Card_Pool_Section:
 
         self.ent_min_size.grid(row=4, column=1, padx=5, pady=5, sticky="w")
 
+    # Setter functions.
     def set_index(self):
+        '''
+        Sets the index. Can only be used when the "Pool_Section" is appended to a list.
+        '''
         self.index = self.view.get_pool_list().index(self)
 
-    def change_pool_type(self):
+    def set_pool_type(self):
+        '''
+        Sets the type of the "Pool Section". 
+        There are only two types, so it always changes to the other type.
+        '''
         state = self.lbl_size["text"]
         if state == "Minimum pool size:":
             self.lbl_size.config(text="Exact pool size:")
         else:
             self.lbl_size.config(text="Minimum pool size:")
 
-    def add_card(self, card_name):
-        self.card_names.append(card_name)
-        self.update_card_display_text()
-
-    def remove_card(self, card_name):
-        self.card_names.remove(card_name)
-        self.update_card_display_text()
-
-    def update_card_display_text(self):
+    def set_card_display_text(self):
+        '''
+        Sets the card display of the "Pool Section"
+        '''
         text_list = "Card name \n\n"
-        if self.card_names != []:
-            for card in self.card_names:
+        if self.card_names != []:                   
+            for card in self.card_names:            # Every card should be listed on a new line.
                 text_list += "- " + card + "\n"
-        else:
+        else:                                       # If there are no cards in this pool, state this.
             text_list += "No cards in pool."
 
         self.lbl_card_display.config(text=text_list)
-    
+
+    # Managing cards.
+    def add_card(self, card_name):
+        '''
+        Assigns a card to this pool display.
+        '''
+        self.card_names.append(card_name)
+        self.set_card_display_text()                # Update the card display
+
+    def del_card(self, card_name):
+        '''
+        Unassigns a card from this pool display.
+        '''
+        self.card_names.remove(card_name)
+        self.set_card_display_text()                # Update the card display
+
+    # Getter functions.
     def get_frame(self):
         return self.frame
     
@@ -111,25 +133,27 @@ class Card_Pool_Section:
         return self.drp_del_card
 
 class View(tk.Tk, Observer):
-    # class that manages all visual aspects of the program
+    '''
+    Class that manages all visual aspects of the program.
+    '''
     def __init__(self, model, controller):
         
-        # interaction with the model and the controller
-        self.model = model
-        self.model.attach(self)
-        self.controller = controller
+        # Interaction with the model and the controller.
 
-        self.pool_list = []
+        self.model = model              # Which model should be observed.
+        self.model.attach(self)         # Attach to this model.
+        self.controller = controller    # Controller contains all event handlers.
 
         ###################################################################################################################################################
         
-        # setup a window
+        # Setup a window.
+
         tk.Tk.__init__(self)
         self.geometry("830x500")
         self.resizable(False, True)
         self.title("YGO Hand Master")
 
-        # create two sections for the window
+        # Create two sections for the window and pack them.
         self.frm_top = tk.Frame(master=self, borderwidth=5)
         self.frm_top.pack(anchor="nw")
 
@@ -138,27 +162,27 @@ class View(tk.Tk, Observer):
         
         ###################################################################################################################################################
 
-        # deck controll section
+        # Deck controll section.
         
         self.frm_deck_selection = tk.Frame(master=self.frm_top, relief=tk.RIDGE, borderwidth=5)
         self.frm_deck_selection.grid(row=0, column=0, padx=5, pady=5)
         
-        # labels
+        # Labels.
         lbl_deck_selection = tk.Label(master=self.frm_deck_selection, text="Deck Selection", height=1, font=("Helvetica", "11", "bold"))
         lbl_deck_import = tk.Label(master=self.frm_deck_selection, text="Deck path:", height=1, width=15, anchor="w")
         lbl_stored_deck = tk.Label(master=self.frm_deck_selection, text="Stored decks:", height=1, width=15, anchor="w")
 
-        # entries
+        # Entries.
         self.ent_deck_import = tk.Entry(master=self.frm_deck_selection, width=50)
 
-        # decklist dropdown menu
+        # Dropdownlists.
         self.drp_stored_deck = Changeable_OptionMenu(self.frm_deck_selection, "Select deck.", [], 42)
 
-        # buttons
+        # Buttons.
         self.btn_import = tk.Button(master=self.frm_deck_selection, text="IMPORT", command=self.controller.on_deck_import)
         self.btn_delete = tk.Button(master=self.frm_deck_selection, text="DELETE", command=self.controller.on_deck_delete)
 
-        # arrange everything
+        # Arrange everything.
         lbl_deck_selection.grid(row=0, column=0, padx=1, pady=10, sticky="w")
         lbl_deck_import.grid(row=1, column=0, padx=1, pady=1, sticky="w")
         lbl_stored_deck.grid(row=2, column=0, padx=1, pady=1, sticky="w")
@@ -172,22 +196,23 @@ class View(tk.Tk, Observer):
         
         ###################################################################################################################################################
 
-        # calculation section
+        # Calculation section.
+
         self.frm_calculation = tk.Frame(master=self.frm_top, relief=tk.RIDGE, borderwidth=5)
         self.frm_calculation.grid(row=0, column=1, padx=5, pady=5)
 
-        # labels
+        # Labels.
         lbl_initialize_calculation = tk.Label(master=self.frm_calculation, text="Initialize Calculation", height=1, font=("Helvetica", "11", "bold"))
         lbl_sample_size = tk.Label(master=self.frm_calculation, text="Sample size:", height=1, width=15, anchor="w")
 
-        # entries
+        # Entries.
         self.ent_sample_size = tk.Entry(master=self.frm_calculation, width=12)
 
-        # buttons
+        # Buttons.
         self.btn_add_pool = tk.Button(master=self.frm_calculation, text="+ POOL", command=self.controller.on_add_pool)
         self.btn_calculate = tk.Button(master=self.frm_calculation, text="CALCULATE", command=self.controller.on_calculate)
 
-        # arrange everything
+        # Arrange everything.
         lbl_initialize_calculation.grid(row=0, column=0, padx=1, pady=10, sticky="w")
         lbl_sample_size.grid(row=1, column=0, padx=1, pady=4, sticky="w")
 
@@ -198,73 +223,78 @@ class View(tk.Tk, Observer):
         
         ###################################################################################################################################################
 
-        # let the window run
+        # Pool section.
+        
+        self.pool_list = []     # Store all pools that were created.
+        
+        ###################################################################################################################################################
+
+        # Let the window run.
+
         self.mainloop()
 
+    # Update functions.
     def update(self, update_event, index = None, card_name = None):
-    # update display after a something happend
-        # create a new pool and add it to the pool list
-        if update_event == "add pool":
-            self.update_pool_list()
+        '''
+        Updates the View class when something happend.
+        update_event specifies which part of the display shoul be updated.
+        index, card_name are optional and only need for certain update_events.
+        '''
+    
+        if update_event == "add pool":                        # Create a new pool and add it to the pool list
 
-        # card was added to a pool
-        elif update_event == "add card to pool":
-            # update list for add (cards that are not in any pool)
-            # must be done in every card pool!
-            for pool in self.pool_list: 
-               pool.get_drp_add_card().delete_item(card_name)
-            # update list for delete (cards that are in the pool)
-            self.pool_list[index].get_drp_del_card().append_item(card_name)
-            # update pool display
-            self.pool_list[index].add_card(card_name)
+            self.add_pool_display()
 
-        # remove a card from the pool
-        elif update_event == "removed card from pool":
-            # update list for add (cards that are not in any pool)
-            # must be done in every card pool!
-            for pool in self.pool_list:
-                pool.get_drp_add_card().append_item(card_name)
-            # update list for delete (cards that are in the pool)
-            self.pool_list[index].get_drp_del_card().delete_item(card_name)
-            # update pool display
-            self.pool_list[index].remove_card(card_name)
+        
+        elif update_event == "add card to pool":              # Card was added to a pool
 
-        # start the calculation
-        elif update_event == "start calculate":
-            # set the correct sample size
-            sample_size = self.ent_sample_size.get()
-            try:
-                sample_size = int(sample_size)
-            except:
+            for pool in self.pool_list:                                         # Update list for add (cards that are not in any pool).
+               pool.get_drp_add_card().remove_item(card_name)                   # Must be done for every card pool!
+            self.pool_list[index].get_drp_del_card().append_item(card_name)     # Update list for delete (cards that are in the pool).
+            self.pool_list[index].add_card(card_name)                           # Update the pool display.
+
+        elif update_event == "removed card from pool":        # Remove a card from the pool
+
+            for pool in self.pool_list:                                         # Update list for add (cards that are not in any pool).
+                pool.get_drp_add_card().append_item(card_name)                  # Must be done for every card pool!
+            self.pool_list[index].get_drp_del_card().remove_item(card_name)     # Update list for delete (cards that are in the pool).
+            self.pool_list[index].del_card(card_name)                           # Update the pool display.
+
+        elif update_event == "start calculate":               # The calculation will start, read all data.
+
+            sample_size = self.ent_sample_size.get()                            # Get the correct sample_size
+            try:                                                                # The user input is an integer.
+                sample_size = int(sample_size)                                  
+            except:                                                             # The user entered something else.
                 self.ent_sample_size.delete(0, tk.END) 
                 self.ent_sample_size.insert(0, 0)
-                sample_size = 0
-            self.model.get_deck_manager().set_sample_size(int(sample_size))
+                sample_size = 0                                                 # Write the sample_size to 0.
+            self.model.get_deck_manager().set_sample_size(int(sample_size))     # Set the sample_size.
             
-            # set the correct slot size of every pool
-            for index in range(len(self.pool_list)):
-                try:
-                    self.model.get_deck_manager().get_card_pools()[index].set_slot_size(int(self.pool_list[index].get_min_size()), sample_size)
-                except:
-                    self.model.get_deck_manager().get_card_pools()[index].set_slot_size(0, sample_size)
+            for index in range(len(self.pool_list)):                            # Because the sample_size changed, all slot_sizes of the pools must be updated.
+                try:                                                            
+                    self.model.get_deck_manager().get_pools()[index].set_slot_size(int(self.pool_list[index].get_min_size()), sample_size)
+                except:                                                         # When the user inputs are invalid, set to 0
+                    self.model.get_deck_manager().get_pools()[index].set_slot_size(0, sample_size)
 
-        # change only equal of a pool
-        elif update_event == "changed only equal":
-            self.pool_list[index].change_pool_type()
-            
+        elif update_event == "changed only equal":           # Change the pool type display.
+            self.pool_list[index].set_pool_type()
 
-            
-    def update_pool_list(self):
+    # Managing pools            
+    def add_pool_display(self):
+        '''
+        Creates a new Pool_Display and adds it to the pool_list.
+        '''
         pool_count = len(self.pool_list)
-        pool_view = Card_Pool_Section(self)
-        self.pool_list.append(pool_view)
-        pool_view.set_index()
-        if (pool_count % 2) == 0:
+        pool_view = Pool_Section(self)          # Create the Pool_Section.
+        self.pool_list.append(pool_view)        # Append it to self.pool_list.
+        pool_view.set_index()                   # Update the index of the pool.
+        if (pool_count % 2) == 0:               # Place the pool in the frame depending on the length of self.pool_list
             pool_view.get_frame().grid(row=(pool_count // 2), column=0, padx=5, pady=5, sticky="nw")
         else:
             pool_view.get_frame().grid(row=(pool_count // 2), column=1, padx=5, pady=5, sticky="nw")
 
-    # getter functions
+    # Getter functions.
     def get_model(self):
         return self.model
    

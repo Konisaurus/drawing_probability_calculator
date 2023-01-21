@@ -1,89 +1,118 @@
+# Imports
 import tkinter as tk
 
-        
+# Classes        
 class Changeable_OptionMenu():
-    # an tk.OptionMenu that has a list which can be changed
+    '''
+    A tk.OptionMenu that has a list which can be changed.
+    Access the tk.OptionMenu class through self.get_OptionMenu_class()
+    '''
     def __init__(self, master, dropdown_title, option_list, width):
-        self.unremovable_option = dropdown_title
-        self.options = [self.unremovable_option]
-        self.options.extend(option_list)
+        self.unremovable_option = dropdown_title    # The first element of the dropdown list is the title, it can't be removed.
+        self.options = [self.unremovable_option]    # All the options.
+        self.options.extend(option_list)            # Add the options to the list
 
-        self.variable = tk.StringVar(master)
+        self.variable = tk.StringVar(master)                                 # Variable which the OptionMenu becomes (strings).
         self.variable.set(dropdown_title)
-        self.dropdown = tk.OptionMenu(master, self.variable, *self.options)
-        self.dropdown.config(width=width)
+        self.option_menu = tk.OptionMenu(master, self.variable, *self.options)  # OptionMenu.
+        self.option_menu.config(width=width)                                    # Set a default width, so that it does NOT change depending on the item selected.
 
-    def _update_options(self):
-        # after a change to the options list, the tk.OptionMenu must be updated
-        self.dropdown["menu"].delete(0, "end")
+    def update_options(self):
+        '''
+        After a change to self.option_list, the tk.OptionMenu must be updated.
+        '''
+        self.option_menu["menu"].delete(0, "end")
         for item in self.options:
-            self.dropdown["menu"].add_command(label=item, command=lambda value=item: self.variable.set(value))
+            self.option_menu["menu"].add_command(label=item, command=lambda value=item: self.variable.set(value))
+        self.variable.set(self.unremovable_option)
 
+    # Manage self.option_list
     def append_item(self, item):
-        # append an item to the option list
+        '''
+        Appends an item to self.option_list
+        '''
         self.options.append(str(item))
-        self._update_options()
+        self.update_options()              # Update OptionMenu
 
-    def delete_item(self, item):
-        # deletes the selected item from the option list
-        if item in self.options and not item == self.unremovable_option:
-            self.options.remove(item)
-            self._update_options()
-            self.variable.set(self.unremovable_option)
+    def remove_item(self, item):
+        '''
+        Removes the selected item from self.option_list.
+        '''
+        if item in self.options and not item == self.unremovable_option:    # We don't want self.option_list to be empty.
+            self.options.remove(item)               
+            self.update_options()                                           # Update OptionMenu.         
 
+    # Getter functions.
     def get_OptionMenu_class(self):
-        # get the OptionMenu, which is the core of this class
-        return self.dropdown
+        return self.option_menu
     
     def get_variable(self):
         return self.variable.get()
 
 
 class Scrollable_Frame():
-    # a frmae with a scrollbar for the y-axis.
+    '''
+    Frame with a scrollbar for the y-axis.
+    Access this frame with self.get_frame()
+    '''
     def __init__(self, master):
-        # create a frame that wraps everything up
+        # Create a frame that wraps everything up.
         self.frm_wrapper = tk.Frame(master=master, borderwidth=5)
 
-        # create a canvas which will be scrollable
+        # Create a canvas which will be scrollable.
         self.cnv_scrollbar = tk.Canvas(master=self.frm_wrapper)
         self.cnv_scrollbar.pack(side=tk.LEFT,fill=tk.BOTH,expand=1)
 
-        # add a scrollbar to the canvas
+        # Add a scrollbar to the canvas.
         self.scb_yaxis = tk.Scrollbar(master=self.frm_wrapper, orient="vertical", command=self.cnv_scrollbar.yview)
         self.scb_yaxis.pack(side="right",fill="y")
 
-        # configure the canvas
+        # Configure the canvas.
         self.cnv_scrollbar.configure(yscrollcommand=self.scb_yaxis.set)
         self.cnv_scrollbar.bind("<Configure>", lambda e: self.cnv_scrollbar.config(scrollregion= self.cnv_scrollbar.bbox(tk.ALL))) 
 
-        # create another frame inside the canvas which will contain all widgets and add it to the canvas
+        # Create another frame inside the canvas which will contain all widgets and add it to the canvas.
         self.frm_container = tk.Frame(master=self.cnv_scrollbar)
         self.cnv_scrollbar.create_window((0,0), window=self.frm_container, anchor="nw")  
 
-        # bind the scrollwheel to the scrollbar
-        self.frm_container.bind("<Enter>", self._bound_to_mousewheel)
-        self.frm_container.bind("<Leave>", self._unbound_to_mousewheel)
-        self.frm_container.bind("<Configure>", self._adjust_scrollregion)
+        # Bind the scrollwheel to the scrollbar,
+        self.frm_container.bind("<Enter>", self.bind_mousewheel)
+        self.frm_container.bind("<Leave>", self.unbind_mousewheel)
+        self.frm_container.bind("<Configure>", self.adjust_scrollregion)
 
-    # pack this widget
     def pack(self):
+        '''
+        Packs this widget.
+        '''
         self.frm_wrapper.pack(fill="both",expand=1, anchor="nw")
 
-    # access/add all widgets via this getter function
+    
     def get_frame(self):
+        '''
+        # Access/add all widgets in this frame.
+        '''
         return self.frm_container
         
-    # methods needed for the mousewheel to work with the scrollbar when over the area
-    def _bound_to_mousewheel(self, event):
-        self.cnv_scrollbar.bind_all("<MouseWheel>", self._handle_mousewheel)
+    def bind_mousewheel(self, event):
+        '''
+        Binds mousewheel when inside of the frame.
+        '''
+        self.cnv_scrollbar.bind_all("<MouseWheel>", self.handle_mousewheel)
 
-    def _unbound_to_mousewheel(self, event):
+    def unbind_mousewheel(self, event):
+        '''
+        Unbinds mousewheel when outside of the frame.
+        '''
         self.cnv_scrollbar.unbind_all("<MouseWheel>")
 
-    def _handle_mousewheel(self, event):
+    def handle_mousewheel(self, event):
+        '''
+        Configures the mousewheel with the scorllbar.
+        '''
         self.cnv_scrollbar.yview_scroll(int(-1*(event.delta/120)), "units")
 
-    # when the frame gets bigger, the scollbarregion must be adjusted
-    def _adjust_scrollregion(self, event):
+    def adjust_scrollregion(self, event):
+        '''
+        Adjusts the scrollbarregion when the frame gets bigger
+        '''
         self.cnv_scrollbar.configure(scrollregion=self.cnv_scrollbar.bbox("all"))

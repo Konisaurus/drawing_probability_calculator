@@ -1,46 +1,74 @@
-import copy
+'''
+This module defines the Controll class.
+'''
+
+# Imports.
 from model_hypgeo import Model_Hypgeo
 from view import View
 
+# Classes.
 class Controller:
+    '''
+    Controlls the interaction from the user with the View and Model class.
+    '''
     def __init__(self):
-        self.model = Model_Hypgeo()
-        self.view = View(self.model, self)
+        self.model = Model_Hypgeo()         # Model of the system, contains logic aspects.
+        self.view = View(self.model, self)  # View of the system, contians visual aspects.
 
-    # event handlers
+    # Event handlers.
     def on_deck_import(self):
-        # adds a deck to the dropdown menu
+        '''
+        Adds a deck to the "Deck Selection" dropdown menu
+
+        NOT IMPLEMENTED YET
+        '''
         pass
 
     def on_deck_delete(self):
-        # deletes a deck
+        '''
+        Deletes a deck from the "Deck Selection" dropdown menu
+
+        NOT IMPLEMENTED YET
+        '''
         pass
 
     def on_add_pool(self):
-        # create pool in model
-        self.model.get_deck_manager().add_card_pool()
+        '''
+        Create a pool in the models self.deck_manager
+        '''
+        self.model.get_deck_manager().add_pool()
                
     def on_calculate(self):
-        # deletes the selected deck from the dropdown menu 
+        '''
+        Calculate the probability of drawing the hand the user set up.
+        '''
         print(self.model.calculate())
 
     def on_add_card(self, index, card_name):
-        # add a card to a card pool
-        if card_name == "Select card.":
+        '''
+        Assigns a card to a pool.
+        '''
+        if card_name == "Select card.":     # Nothing is selected, do nothing.
             pass
-        else:
+        else:                               # Assign the selected card.
             self.model.get_deck_manager().add_card_to_pool(index, card_name)
 
     def on_del_card(self, index, card_name):
-        # deletes a card from a card pool 
-        if card_name == "Select card.":
+        '''
+        Unassigns a card from a pool.
+        '''
+        if card_name == "Select card.":     # Nothing is selected, do nothing.
             pass
-        else:
-            self.model.get_deck_manager().remove_card_from_pool(index, card_name)
+        else:                               # Assign the selected card.
+            self.model.get_deck_manager().del_card_in_pool(index, card_name)
 
     def on_change_type(self, index):
-        # changes the type of a card pool (X == x or X <= x)
-        if self.model.get_deck_manager().get_card_pools()[index].get_only_equal() == True:
+        '''
+        Changes the type of a pool. 
+        There are only two states, so it always switches to the other.
+        The two states are X == x or X <= x
+        '''
+        if self.model.get_deck_manager().get_pools()[index].get_only_equal() == True:
             self.model.get_deck_manager().set_pool_only_equal(index, False)
         else:
             self.model.get_deck_manager().set_pool_only_equal(index, True)
