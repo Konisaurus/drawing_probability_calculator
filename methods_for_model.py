@@ -7,7 +7,7 @@ Included are:
 - format_float()
 '''
 
-# Methods
+# Methods.
 def faculty(n):
     '''
     Calculates the faculty n! and returns it.
@@ -15,10 +15,11 @@ def faculty(n):
     if n < 0 or type(n) != int:
         raise TypeError("not a positive integer.")
     
-    n_fak = 1                   # the smallest possible result of faculty is 1
-    if n != 0:                  # 0! is defined as 1
+    n_fak = 1                   # The smallest possible result of faculty is 1.
+    if n != 0:                  # 0! is defined as 1.
         for i in range(2,n+1):  # Increase i by one and multiply it with the result before, until i reaches n.
             n_fak *= i
+            
     return n_fak                # return result = n!
 
 
@@ -62,4 +63,3 @@ def format_float(percentage, decimals, value):
         value *= 100
 
     return float("%.{}f".format(decimals) % value)
-    

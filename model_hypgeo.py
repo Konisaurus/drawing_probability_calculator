@@ -3,7 +3,7 @@ This module contains a model that calculates the probability of drawing
 a sample hand from a deck with the hypergeometric cumulative distribution function.
 '''
 
-# Imports
+# Imports.
 from itertools import product
 from methods_for_model import *
 from classes_for_model import *
@@ -16,8 +16,8 @@ class Model_Hypgeo(Subject):
     from a deck with the hypergeometric cumulative distribution function.
     '''
     def __init__(self):
-        Subject.__init__(self)      # inheritance of Observer pattern
-        self.deck_manager = None    # deck which is used for calculations.
+        Subject.__init__(self)      # Inheritance of Observer pattern.
+        self.deck_manager = None    # Deck which is used for calculations.
 
         # marked section is only for testing
         # will be deleted after everything is done correctly
@@ -35,10 +35,10 @@ class Model_Hypgeo(Subject):
         '''
         Calculate the probability of drawing the configured hand in the deck_manager() and return it.
         '''
-        self.notify("start calculate")                                  # notifiy the Observers that the calculation will start, so the last parameters can be set before calculation.
-        if self.deck_manager != None:                                   # only calculates when a deck is defined
-            slot_size_list = self.deck_manager.get_pool_slot_sizes()    # get all possible slot_sizes of each pool
-            combination_table = []                                      # the combination_table stores the binomial_coefficient of all possible combinations of slot_sizes.
+        self.notify("start calculate")                                  # Notifiy the Observers that the calculation will start, so the last parameters can be set before calculation.
+        if self.deck_manager != None:                                   # Only calculates when a deck is defined.
+            slot_size_list = self.deck_manager.get_pool_slot_sizes()    # Get all possible slot_sizes of each pool.
+            combination_table = []                                      # The combination_table stores the binomial_coefficient of all possible combinations of slot_sizes.
             for element in product(*slot_size_list):                    # product(*slot_sizes_list) is a list with sublists. Every sublist is one combinations of a slot_size from each pool. product() contains all possible combinations.
                 size_sum = 0                                            # Requirements for one valid combination:
                 combination = list(element)                             # - Every slot must be in the combination (a size of a slot can be 0), which is ensured by product().
@@ -50,11 +50,12 @@ class Model_Hypgeo(Subject):
                     for slot_size in combination:                       # The slot_size = we select this many cards from this pool. The binomial coeffiecent is calcualted with n = (total cards in the pool) and k = slot_size.
                         binomial_list.append(binomial_coefficient(self.deck_manager.get_pools()[index].get_card_count(), slot_size))
                         index += 1                                          
-                    size_rest = self.deck_manager.get_sample_size() - size_sum                                              # Maybe not all slots of the sample hand must be occupied by a pool. Here, the size of the rest slot is calculated and stored in size_rest.
-                    binomial_list.append(binomial_coefficient(self.deck_manager.get_unassigned_card_count(), size_rest))    # We calculated the binomial coefficient of the rest, n = number of unassigned cards (are in no pool), k = size_rest.
-                    combination_table.append(binomial_list)                                                                 # Add the rest binomial coefficient to the list. Now, all slots of the sample hand are occupied by something.
+                    size_rest = self.deck_manager.get_sample_size() - size_sum                                                  # Maybe not all slots of the sample hand must be occupied by a pool. Here, the size of the rest slot is calculated and stored in size_rest.
+                    if self.deck_manager.get_unassigned_card_count() >= size_rest:                                              # Remove invalid combinations of size_rest and the unassigned_card_count.
+                        binomial_list.append(binomial_coefficient(self.deck_manager.get_unassigned_card_count(), size_rest))    # We calculated the binomial coefficient of the rest, n = number of unassigned cards (are in no pool), k = size_rest.
+                        combination_table.append(binomial_list)                                                                 # Add the rest binomial coefficient to the list. Now, all slots of the sample hand are occupied by something.
     
-            divisor = binomial_coefficient(self.deck_manager.get_deck_size(), self.deck_manager.get_sample_size())          # All possible samples that a deck can produce which includes successes and failures. It is the divisor of the probability.   
+            divisor = binomial_coefficient(self.deck_manager.get_deck_size(), self.deck_manager.get_sample_size())              # All possible samples that a deck can produce which includes successes and failures. It is the divisor of the probability.   
 
             dividend = 0                            # All successfull, possible samples that this deck can produce. It is the dividend of the probability.
             for combination in combination_table:                                                                         
@@ -88,14 +89,11 @@ if __name__ == "__main__":
     hypgeo = Model_Hypgeo()
     
     hypgeo.set_deck_manager(deck)
-    hypgeo.get_deck_manager().set_sample_size(5)
+    hypgeo.get_deck_manager().set_sample_size(0)
 
     hypgeo.get_deck_manager().add_pool()
     hypgeo.get_deck_manager().add_card_to_pool(0, 'Kashtira Fenrir')
-    hypgeo.get_deck_manager().set_pool_slot_size(0, 1)
+    hypgeo.get_deck_manager().set_pool_slot_size(0, 0)
     hypgeo.get_deck_manager().set_pool_only_equal(0, False)
-
-    hypgeo.get_deck_manager().add_pool()
-    hypgeo.get_deck_manager().set_pool_slot_size(1, 0)
 
     print(hypgeo.calculate())

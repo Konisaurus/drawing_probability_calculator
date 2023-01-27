@@ -18,7 +18,7 @@ class Controller:
     # Event handlers.
     def on_deck_import(self):
         '''
-        Adds a deck to the "Deck Selection" dropdown menu
+        Adds a deck to the "Deck Selection" dropdown menu.
 
         NOT IMPLEMENTED YET
         '''
@@ -26,7 +26,7 @@ class Controller:
 
     def on_deck_delete(self):
         '''
-        Deletes a deck from the "Deck Selection" dropdown menu
+        Deletes a deck from the "Deck Selection" dropdown menu.
 
         NOT IMPLEMENTED YET
         '''
@@ -66,7 +66,7 @@ class Controller:
         '''
         Changes the type of a pool. 
         There are only two states, so it always switches to the other.
-        The two states are X == x or X <= x
+        The two states are X == x or X <= x.
         '''
         if self.model.get_deck_manager().get_pools()[index].get_only_equal() == True:
             self.model.get_deck_manager().set_pool_only_equal(index, False)

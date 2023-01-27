@@ -1,16 +1,16 @@
-# Imports
+# Imports.
 import tkinter as tk
 
-# Classes        
+# Classes.
 class Changeable_OptionMenu():
     '''
     A tk.OptionMenu that has a list which can be changed.
-    Access the tk.OptionMenu class through self.get_OptionMenu_class()
+    Access the tk.OptionMenu class through self.get_OptionMenu_class().
     '''
     def __init__(self, master, dropdown_title, option_list, width):
         self.unremovable_option = dropdown_title    # The first element of the dropdown list is the title, it can't be removed.
         self.options = [self.unremovable_option]    # All the options.
-        self.options.extend(option_list)            # Add the options to the list
+        self.options.extend(option_list)            # Add the options to the list.
 
         self.variable = tk.StringVar(master)                                 # Variable which the OptionMenu becomes (strings).
         self.variable.set(dropdown_title)
@@ -26,13 +26,13 @@ class Changeable_OptionMenu():
             self.option_menu["menu"].add_command(label=item, command=lambda value=item: self.variable.set(value))
         self.variable.set(self.unremovable_option)
 
-    # Manage self.option_list
+    # Manage self.option_list.
     def append_item(self, item):
         '''
-        Appends an item to self.option_list
+        Appends an item to self.option_list.
         '''
         self.options.append(str(item))
-        self.update_options()              # Update OptionMenu
+        self.update_options()              # Update OptionMenu.
 
     def remove_item(self, item):
         '''
@@ -40,7 +40,7 @@ class Changeable_OptionMenu():
         '''
         if item in self.options and not item == self.unremovable_option:    # We don't want self.option_list to be empty.
             self.options.remove(item)               
-            self.update_options()                                           # Update OptionMenu.         
+            self.update_options()                                           # Update OptionMenu.
 
     # Getter functions.
     def get_OptionMenu_class(self):
@@ -53,7 +53,7 @@ class Changeable_OptionMenu():
 class Scrollable_Frame():
     '''
     Frame with a scrollbar for the y-axis.
-    Access this frame with self.get_frame()
+    Access this frame with self.get_frame().
     '''
     def __init__(self, master):
         # Create a frame that wraps everything up.
@@ -75,7 +75,7 @@ class Scrollable_Frame():
         self.frm_container = tk.Frame(master=self.cnv_scrollbar)
         self.cnv_scrollbar.create_window((0,0), window=self.frm_container, anchor="nw")  
 
-        # Bind the scrollwheel to the scrollbar,
+        # Bind the scrollwheel to the scrollbar.
         self.frm_container.bind("<Enter>", self.bind_mousewheel)
         self.frm_container.bind("<Leave>", self.unbind_mousewheel)
         self.frm_container.bind("<Configure>", self.adjust_scrollregion)
@@ -113,6 +113,6 @@ class Scrollable_Frame():
 
     def adjust_scrollregion(self, event):
         '''
-        Adjusts the scrollbarregion when the frame gets bigger
+        Adjusts the scrollbarregion when the frame gets bigger.
         '''
         self.cnv_scrollbar.configure(scrollregion=self.cnv_scrollbar.bbox("all"))

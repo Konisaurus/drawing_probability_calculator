@@ -71,7 +71,7 @@ class Pool_Manager:
         Sets the value of self.only_equal.
         '''
         self.only_equal = boolean
-        self.set_size_list(sample_size)      # Update self.size_list, because it depends on self.only_equal.
+        self.set_size_list(sample_size)     # Update self.size_list, because it depends on self.only_equal.
 
     def set_size_list(self, sample_size):
         '''
@@ -101,7 +101,7 @@ class Pool_Manager:
         Remove a card_name in the pool. 
         Need a main_dict and sample_size for updating other parts of the class.
         '''
-        self.card_names.remove(card_name)     # Remove the card from the list
+        self.card_names.remove(card_name)     # Remove the card from the list.
         self.set_card_count(main_dict)        # Update the number of cards.
         self.set_size_list(sample_size)       # Update the size_list.
 
@@ -129,7 +129,7 @@ class Deck_Manager:
         self.model = model
 
         # These attributes should always stay the same for one particular deck.
-        self.deck_name = deck.get_name()                   # Deck name
+        self.deck_name = deck.get_name()                   # Deck name.
         self.main_dict = deck.get_main()                   # Main deck as a dictionary, main_dict = {"card1": int(number of card1 in deck), ... , "cardX": int(number of cardX in deck)}.
         self.deck_size = self.calculate_deck_size()        # Number of card copies in deck.
 
@@ -137,27 +137,27 @@ class Deck_Manager:
         self.sample_size = sample_size                     # Number of cards that are drawn in a sample hand.
         self.defined_pools = defined_pools                 # List of different card pools.
         self.unassigned_cards = None                       # Dict of cards that are in no card pool.
-        self.set_unassigned_cards()                        # Set self.unassigned_cards         
+        self.set_unassigned_cards()                        # Set self.unassigned_cards.         
         self.unassigned_card_count = None                  # Number of card copies that are not assigned to any pool.
-        self.set_unassigned_card_count()                   # Set self.unassigned_card_count
+        self.set_unassigned_card_count()                   # Set self.unassigned_card_count.
     
     def calculate_deck_size(self):
         '''
         Calculates the size of the deck and returns it.
         '''
         deck_size = 0
-        for key in self.main_dict:                         # the deck size is the sum of all copies of each card_name.
+        for key in self.main_dict:                         # The deck size is the sum of all copies of each card_name.
             deck_size += self.main_dict[key]
         return deck_size
 
     # Setter funcitions.
     def set_sample_size(self, sample_size):
         '''
-        Sets self.sample_size
+        Sets self.sample_size.
         '''
         self.sample_size = sample_size
 
-        # update everything is dependend on the sample size
+        # Update everything is dependend on the sample size.
         if self.defined_pools != []:
             for pool in self.defined_pools:
                 pool.set_size_list(self.sample_size)
@@ -166,7 +166,7 @@ class Deck_Manager:
         '''
         Sets self.unassigned_cards.
         '''
-        unassigned_cards = copy.deepcopy(self.main_dict)    # make a deep copy of the self.main_dict, because we need a new modfied version.
+        unassigned_cards = copy.deepcopy(self.main_dict)    # Make a deep copy of the self.main_dict, because we need a new modfied version.
         if self.defined_pools != []:                        # If there are no defined card pools, we don't need to remove any cards.
             for pool in self.defined_pools:                 # Go through all pools, remove the all cards that are in a pool from unassigned_cards.
                 if pool.get_card_names() != []:
@@ -176,7 +176,7 @@ class Deck_Manager:
     
     def set_unassigned_card_count(self):
         '''
-        Sets self.unassigned_card_count
+        Sets self.unassigned_card_count.
         '''
         unassigned_card_count = self.deck_size                  # Get the number of cards in a deck.
         if self.defined_pools != []:                            # Reduce it by the size of each pool.
@@ -184,7 +184,7 @@ class Deck_Manager:
                 unassigned_card_count -= pool.get_card_count()
         self.unassigned_card_count = unassigned_card_count
 
-    # Access setter functions of a pool
+    # Access setter functions of a pool.
     def set_pool_slot_size(self, index, min_slot_size):
         '''
         Sets self.min_slot_size of the pool in self.defined_pool_list with index.
@@ -192,24 +192,23 @@ class Deck_Manager:
         self.defined_pools[index].set_slot_size(min_slot_size, self.sample_size)
 
     def set_pool_only_equal(self, index, boolean):
-        # set the only_equal variabl
         '''
         sets self.only_equal of the pool in self.defined_pool_list with index.
         '''
         self.defined_pools[index].set_only_equal(boolean, self.sample_size)
         self.model.notify("changed only equal", index)                       # Use notify() method of model, because this change is noticable in the View class.
 
-    # Managing cards and pools
+    # Managing cards and pools.
     def add_pool(self):
         '''
-        Creates an "empty" card pool object and adds it to self.defined_pools
+        Creates an "empty" card pool object and adds it to self.defined_pools.
         '''
         self.defined_pools.append(copy.deepcopy(Pool_Manager(self)))
         self.model.notify("add pool")                                        # Use notify() method of model, because this change is noticable in the View class.
 
     def add_card_to_pool(self, index, card_name):
         '''
-        Adds a card_name to a pool in self.defined_pools with index
+        Adds a card_name to a pool in self.defined_pools with index.
         '''
         self.defined_pools[index].add_card(card_name, self.main_dict, self.sample_size)
 
@@ -220,7 +219,7 @@ class Deck_Manager:
 
     def del_card_in_pool(self, index, card_name):
         '''
-        Removes a card_name from a pool in self.defined_pools with index
+        Removes a card_name from a pool in self.defined_pools with index.
         '''
         self.defined_pools[index].del_card(card_name, self.main_dict, self.sample_size)
 
@@ -229,7 +228,7 @@ class Deck_Manager:
 
         self.model.notify("removed card from pool", index, card_name)       # Use notify() method of model, because this change is noticable in the View class.
 
-    # Getter functions
+    # Getter functions.
     def get_model(self):
         return self.model
     
@@ -262,4 +261,3 @@ class Deck_Manager:
 
     def get_unassigned_card_count(self):
         return self.unassigned_card_count
-    

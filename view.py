@@ -2,7 +2,7 @@
 This module contains the View class which contains all the visual aspects of the system.
 '''
 
-# Imports
+# Imports.
 import tkinter as tk
 from widgets_for_gui import *
 from observer_subject import Observer
@@ -54,7 +54,8 @@ class Pool_Section:
         self.btn_change_type = tk.Button(master=self.frame, text="CHANGE", command= lambda: self.view.get_controller().on_change_type(self.index))
 
         # Entries.
-        self.ent_min_size = tk.Entry(master=self.frame, width=29)
+        self.ent_min_size = tk.Entry(master=self.frame, width=29, validate="key")
+        self.ent_min_size.configure(validatecommand=(self.ent_min_size.register(self.view.validate),'%d', '%P'))
 
         # Arrange everything.
         self.lbl_card_display.grid(row=1, column=0, columnspan=3, padx=5, pady=5, sticky="nw")
@@ -72,7 +73,7 @@ class Pool_Section:
         self.btn_change_type.grid(row=4, column=2, padx=5, pady=5, sticky="w")
 
         self.ent_min_size.grid(row=4, column=1, padx=5, pady=5, sticky="w")
-
+        
     # Setter functions.
     def set_index(self):
         '''
@@ -93,7 +94,7 @@ class Pool_Section:
 
     def set_card_display_text(self):
         '''
-        Sets the card display of the "Pool Section"
+        Sets the card display of the "Pool Section".
         '''
         text_list = "Card name \n\n"
         if self.card_names != []:                   
@@ -104,20 +105,27 @@ class Pool_Section:
 
         self.lbl_card_display.config(text=text_list)
 
+    def set_min_size(self, min_size):
+        '''
+        Inserts min_size into self.ent_min_size.
+        '''
+        self.ent_min_size.delete(0, tk.END) 
+        self.ent_min_size.insert(0, min_size)
+        
     # Managing cards.
     def add_card(self, card_name):
         '''
         Assigns a card to this pool display.
         '''
         self.card_names.append(card_name)
-        self.set_card_display_text()                # Update the card display
+        self.set_card_display_text()                # Update the card display.
 
     def del_card(self, card_name):
         '''
         Unassigns a card from this pool display.
         '''
         self.card_names.remove(card_name)
-        self.set_card_display_text()                # Update the card display
+        self.set_card_display_text()                # Update the card display.
 
     # Getter functions.
     def get_frame(self):
@@ -196,7 +204,7 @@ class View(tk.Tk, Observer):
         
         ###################################################################################################################################################
 
-        # Calculation section.
+        # Initialize calculation section.
 
         self.frm_calculation = tk.Frame(master=self.frm_top, relief=tk.RIDGE, borderwidth=5)
         self.frm_calculation.grid(row=0, column=1, padx=5, pady=5)
@@ -206,7 +214,8 @@ class View(tk.Tk, Observer):
         lbl_sample_size = tk.Label(master=self.frm_calculation, text="Sample size:", height=1, width=15, anchor="w")
 
         # Entries.
-        self.ent_sample_size = tk.Entry(master=self.frm_calculation, width=12)
+        self.ent_sample_size = tk.Entry(master=self.frm_calculation, width=12, validate="key")
+        self.ent_sample_size.configure(validatecommand=(self.ent_sample_size.register(self.validate),'%d', '%P'))
 
         # Buttons.
         self.btn_add_pool = tk.Button(master=self.frm_calculation, text="+ POOL", command=self.controller.on_add_pool)
@@ -232,7 +241,20 @@ class View(tk.Tk, Observer):
         # Let the window run.
 
         self.mainloop()
-
+    
+    # Validate function 
+    def validate(self, type_of_action, entry_value):
+        '''
+        Validate function that only allows integers as inserts in entries.
+        '''
+        if type_of_action == '1':           # '1' is insert
+            if not entry_value.isdigit():
+                return False
+            else:
+                return True
+        else:
+            return True
+        
     # Update functions.
     def update(self, update_event, index = None, card_name = None):
         '''
@@ -241,19 +263,19 @@ class View(tk.Tk, Observer):
         index, card_name are optional and only need for certain update_events.
         '''
     
-        if update_event == "add pool":                        # Create a new pool and add it to the pool list
+        if update_event == "add pool":                        # Create a new pool and add it to the pool list.
 
             self.add_pool_display()
 
         
-        elif update_event == "add card to pool":              # Card was added to a pool
+        elif update_event == "add card to pool":              # Card was added to a pool.
 
             for pool in self.pool_list:                                         # Update list for add (cards that are not in any pool).
                pool.get_drp_add_card().remove_item(card_name)                   # Must be done for every card pool!
             self.pool_list[index].get_drp_del_card().append_item(card_name)     # Update list for delete (cards that are in the pool).
             self.pool_list[index].add_card(card_name)                           # Update the pool display.
 
-        elif update_event == "removed card from pool":        # Remove a card from the pool
+        elif update_event == "removed card from pool":        # Remove a card from the pool.
 
             for pool in self.pool_list:                                         # Update list for add (cards that are not in any pool).
                 pool.get_drp_add_card().append_item(card_name)                  # Must be done for every card pool!
@@ -262,22 +284,35 @@ class View(tk.Tk, Observer):
 
         elif update_event == "start calculate":               # The calculation will start, read all data.
 
-            sample_size = self.ent_sample_size.get()                            # Get the correct sample_size
-            try:                                                                # The user input is an integer.
-                sample_size = int(sample_size)                                  
-            except:                                                             # The user entered something else.
+            sample_size = self.ent_sample_size.get()                            # Get the correct sample_size.
+            deck_size= self.model.get_deck_manager().get_deck_size()            # Get the correct deck_size for checking if sample_size is valid.
+
+            if sample_size == '':                                               # If the user did not enter anything, set to 0.
                 self.ent_sample_size.delete(0, tk.END) 
                 self.ent_sample_size.insert(0, 0)
-                sample_size = 0                                                 # Write the sample_size to 0.
-            self.model.get_deck_manager().set_sample_size(int(sample_size))     # Set the sample_size.
-            
-            for index in range(len(self.pool_list)):                            # Because the sample_size changed, all slot_sizes of the pools must be updated.
-                try:                                                            
-                    self.model.get_deck_manager().get_pools()[index].set_slot_size(int(self.pool_list[index].get_min_size()), sample_size)
-                except:                                                         # When the user inputs are invalid, set to 0
-                    self.model.get_deck_manager().get_pools()[index].set_slot_size(0, sample_size)
+                sample_size = 0
 
-        elif update_event == "changed only equal":           # Change the pool type display.
+            elif int(sample_size) > deck_size:                                  # If the user input sample_size is to big, change it to the deck_size.
+                self.ent_sample_size.delete(0, tk.END) 
+                self.ent_sample_size.insert(0, deck_size)
+                sample_size = deck_size 
+
+            self.model.get_deck_manager().set_sample_size(int(sample_size))     # Set the sample_size in the model.
+            
+            for index in range(len(self.pool_list)):                            # Because the sample_size changed, all slot_sizes of the pools must be updated.   
+                min_size = self.pool_list[index].get_min_size()    
+
+                if min_size == '':                                              # If the user did not enter anything, set to 0.
+                    self.pool_list[index].set_min_size(0)
+                    min_size = 0
+
+                elif int(min_size) > int(sample_size):                          # If the user input for min_size is to big, change it to the sample_size.
+                    self.pool_list[index].set_min_size(int(sample_size))
+                    min_size = sample_size
+
+                self.model.get_deck_manager().get_pools()[index].set_slot_size(int(min_size), int(sample_size))
+
+        elif update_event == "changed only equal":            # Change the pool type display.
             self.pool_list[index].set_pool_type()
 
     # Managing pools            
@@ -289,7 +324,7 @@ class View(tk.Tk, Observer):
         pool_view = Pool_Section(self)          # Create the Pool_Section.
         self.pool_list.append(pool_view)        # Append it to self.pool_list.
         pool_view.set_index()                   # Update the index of the pool.
-        if (pool_count % 2) == 0:               # Place the pool in the frame depending on the length of self.pool_list
+        if (pool_count % 2) == 0:               # Place the pool in the frame depending on the length of self.pool_list.
             pool_view.get_frame().grid(row=(pool_count // 2), column=0, padx=5, pady=5, sticky="nw")
         else:
             pool_view.get_frame().grid(row=(pool_count // 2), column=1, padx=5, pady=5, sticky="nw")

@@ -7,7 +7,7 @@ import random
 import copy
 from classes_for_model import *
 
-# Mehtods
+# Mehtods.
 def convert_dict_to_list(old_dict):
     # create a list with all keys from a dictionary and return it.
     # Each key is added to the list as many times as its associated value.

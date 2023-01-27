@@ -15,7 +15,7 @@ class Observer():
     def update(self, update_event):
         '''
         Update when something in the Subject happens.
-        update_even specifies which part of the Observer should update.
+        update_event specifies which part of the Observer should update.
         '''
         pass
 
