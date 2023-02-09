@@ -18,6 +18,7 @@ class Model_Hypgeo(Subject):
     def __init__(self):
         Subject.__init__(self)      # Inheritance of Observer pattern.
         self.deck_manager = None    # Deck which is used for calculations.
+        self.result = None          # Store the result of the last calculation.
 
         # marked section is only for testing
         # will be deleted after everything is done correctly
@@ -66,7 +67,8 @@ class Model_Hypgeo(Subject):
 
             hypgeo_cdf = dividend / divisor         # We get the hypgeo. cdf by dividing (successful samples) / (possible samples).
 
-            return hypgeo_cdf
+            self.result = hypgeo_cdf                # Set self.result.
+            self.notify("end calculte")             # Notify the Observers that the caluclation has finished.
 
     # Setter functions.
     def set_deck_manager(self, deck):
@@ -75,6 +77,9 @@ class Model_Hypgeo(Subject):
     # Getter functions.
     def get_deck_manager(self):
         return self.deck_manager
+    
+    def get_result(self):
+        return self.result
 
 
 # Testing this model class.

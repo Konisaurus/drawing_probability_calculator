@@ -240,8 +240,9 @@ class View(tk.Tk, Observer):
 
         # Let the window run.
 
+        self.eval('tk::PlaceWindow . center')
         self.mainloop()
-    
+
     # Validate function 
     def validate(self, type_of_action, entry_value):
         '''
@@ -311,6 +312,27 @@ class View(tk.Tk, Observer):
                     min_size = sample_size
 
                 self.model.get_deck_manager().get_pools()[index].set_slot_size(int(min_size), int(sample_size))
+
+        elif update_event == "end calculte":                # Share the result with the user.
+
+            popup_result = tk.Toplevel()                                        # Create a popup window.
+            popup_result.geometry("380x70")                                     # Set size.
+            popup_result.resizable(False, False)                                # Lock size.
+            x = self.winfo_x()
+            y = self.winfo_y()
+            popup_result.geometry("+%d+%d" %(x+225,y+200))                      # Center the popup in front of the main window.
+            popup_result.grab_set()                                             # "Freezes" the main window until the popup is closed.
+
+            # Labels
+            lbl_result_text = tk.Label(master=popup_result, text="The probability p of drawing the above configuration is:", height=1, font=("Helvetica", "11"), anchor="nw")
+            result = "p = " + str(self.model.get_result())
+            lbl_result = tk.Label(master=popup_result, text=result, height=1, font=("Helvetica", "11", "bold"), anchor="nw")
+            
+            # Arrange everything
+            lbl_result_text.pack(padx=5, pady=5)
+            lbl_result.pack(padx=5, pady=5)
+
+            popup_result.mainloop()
 
         elif update_event == "changed only equal":            # Change the pool type display.
             self.pool_list[index].set_pool_type()

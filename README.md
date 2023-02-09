@@ -1,4 +1,4 @@
-# Yu-Gi-Oh! Hand Master
+# Yu-Gi-Oh! Hand Master (NOT YET FULLY IMPLEMENTED)
 
 A python algorithm for calculating the chances of drawing a sample of cards from a deck.
 
@@ -7,7 +7,7 @@ Includes a GUI for setting up a desired sample hand. The deck selection has not 
 Inculdes two models for calculating the probability of a sample hand:
 - model_hypgeo.py calculates the probability of a certain sample with the hypergeometric probability/cumulative 
   distribution function.
-- model_simulation.py (NOT FULLY IMPLEMENTED YET) draws a random sample hand multiple times and counts if the sample a
+- model_simulation.py (NOT YET FULLY IMPLEMENTED) draws a random sample hand multiple times and counts if the sample a
   success or not.
 
 ## Installation

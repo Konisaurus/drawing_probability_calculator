@@ -42,7 +42,7 @@ class Controller:
         '''
         Calculate the probability of drawing the hand the user set up.
         '''
-        print(self.model.calculate())
+        self.model.calculate()
 
     def on_add_card(self, index, card_name):
         '''
