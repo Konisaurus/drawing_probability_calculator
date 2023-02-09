@@ -39,7 +39,7 @@ class Pool_Section:
         self.set_card_display_text()
 
         # Labels.
-        lbl_title = tk.Label(master=self.frame, text="Card Pool", height=1, font=("Helvetica", "11", "bold"), anchor="nw")
+        lbl_title = tk.Label(master=self.frame, text="Card Pool", height=1, width=42, font=("Helvetica", "11", "bold"), anchor="nw")
         lbl_add_card = tk.Label(master=self.frame, text="Add card:", anchor="nw")
         lbl_del_card = tk.Label(master=self.frame, text="Delete card:", anchor="nw")
         self.lbl_size = tk.Label(master=self.frame, text="Minimum pool size:", anchor="nw", width=15)
@@ -49,30 +49,30 @@ class Pool_Section:
         self.drp_del_card = Changeable_OptionMenu(self.frame, "Select card.", [], 22)
 
         # Buttons.
-        self.btn_add_card = tk.Button(master=self.frame, text="+ CARD", command= lambda: self.view.get_controller().on_add_card(self.index, self.drp_add_card.get_variable()))
-        self.btn_del_card = tk.Button(master=self.frame, text="- CARD", command= lambda: self.view.get_controller().on_del_card(self.index, self.drp_del_card.get_variable()))
-        self.btn_change_type = tk.Button(master=self.frame, text="CHANGE", command= lambda: self.view.get_controller().on_change_type(self.index))
+        self.btn_add_card = tk.Button(master=self.frame, text="+ CARD", width=10, command= lambda: self.view.get_controller().on_add_card(self.index, self.drp_add_card.get_variable()))
+        self.btn_del_card = tk.Button(master=self.frame, text="- CARD", width=10, command= lambda: self.view.get_controller().on_del_card(self.index, self.drp_del_card.get_variable()))
+        self.btn_change_type = tk.Button(master=self.frame, text="CHANGE", width=10, command= lambda: self.view.get_controller().on_change_type(self.index))
 
         # Entries.
         self.ent_min_size = tk.Entry(master=self.frame, width=29, validate="key")
         self.ent_min_size.configure(validatecommand=(self.ent_min_size.register(self.view.validate),'%d', '%P'))
 
         # Arrange everything.
-        self.lbl_card_display.grid(row=1, column=0, columnspan=3, padx=5, pady=5, sticky="nw")
+        self.lbl_card_display.grid(row=1, column=0, columnspan=3, padx=4, pady=4, sticky="nw")
 
-        lbl_title.grid(row=0, column=0, padx=1, pady=10, sticky="w")
-        lbl_add_card.grid(row=2, column=0, padx=5, pady=5, sticky="w")
-        lbl_del_card.grid(row=3, column=0, padx=5, pady=5, sticky="w")
-        self.lbl_size.grid(row=4, column=0, padx=5, pady=5, sticky="w")
+        lbl_title.grid(row=0, column=0, columnspan=3, padx=4, pady=10, sticky="w")
+        lbl_add_card.grid(row=2, column=0, padx=4, pady=4, sticky="w")
+        lbl_del_card.grid(row=3, column=0, padx=4, pady=4, sticky="w")
+        self.lbl_size.grid(row=4, column=0, padx=4, pady=4, sticky="w")
 
-        self.drp_add_card.get_OptionMenu_class().grid(row=2, column=1, padx=5, pady=5, sticky="w")
-        self.drp_del_card.get_OptionMenu_class().grid(row=3, column=1, padx=5, pady=5, sticky="w")
+        self.drp_add_card.get_OptionMenu_class().grid(row=2, column=1, padx=4, pady=4, sticky="w")
+        self.drp_del_card.get_OptionMenu_class().grid(row=3, column=1, padx=4, pady=4, sticky="w")
 
-        self.btn_add_card.grid(row=2, column=2, padx=5, pady=5, sticky="w")
-        self.btn_del_card.grid(row=3, column=2, padx=5, pady=5, sticky="w")
-        self.btn_change_type.grid(row=4, column=2, padx=5, pady=5, sticky="w")
+        self.btn_add_card.grid(row=2, column=2, padx=4, pady=4, sticky="w")
+        self.btn_del_card.grid(row=3, column=2, padx=4, pady=4, sticky="w")
+        self.btn_change_type.grid(row=4, column=2, padx=4, pady=4, sticky="w")
 
-        self.ent_min_size.grid(row=4, column=1, padx=5, pady=5, sticky="w")
+        self.ent_min_size.grid(row=4, column=1, padx=4, pady=4, sticky="w")
         
     # Setter functions.
     def set_index(self):
@@ -157,7 +157,7 @@ class View(tk.Tk, Observer):
         # Setup a window.
 
         tk.Tk.__init__(self)
-        self.geometry("830x500")
+        self.geometry("860x500")
         self.resizable(False, True)
         self.title("YGO Hand Master")
 
@@ -173,62 +173,68 @@ class View(tk.Tk, Observer):
         # Deck controll section.
         
         self.frm_deck_selection = tk.Frame(master=self.frm_top, relief=tk.RIDGE, borderwidth=5)
-        self.frm_deck_selection.grid(row=0, column=0, padx=5, pady=5)
+        self.frm_deck_selection.grid(row=0, column=0, padx=4, pady=4)
         
         # Labels.
-        lbl_deck_selection = tk.Label(master=self.frm_deck_selection, text="Deck Selection", height=1, font=("Helvetica", "11", "bold"))
-        lbl_deck_import = tk.Label(master=self.frm_deck_selection, text="Deck path:", height=1, width=15, anchor="w")
-        lbl_stored_deck = tk.Label(master=self.frm_deck_selection, text="Stored decks:", height=1, width=15, anchor="w")
+        lbl_deck_selection = tk.Label(master=self.frm_deck_selection, text="Deck Selection", height=1, width=57, font=("Helvetica", "11", "bold"), anchor="w")
+        lbl_deck_import = tk.Label(master=self.frm_deck_selection, text="Deck path:", height=1, width=10, anchor="w")
+        lbl_stored_deck = tk.Label(master=self.frm_deck_selection, text="Stored decks:", height=1, width=10, anchor="w")
 
         # Entries.
-        self.ent_deck_import = tk.Entry(master=self.frm_deck_selection, width=50)
+        self.ent_deck_import = tk.Entry(master=self.frm_deck_selection, width=55)
 
         # Dropdownlists.
-        self.drp_stored_deck = Changeable_OptionMenu(self.frm_deck_selection, "Select deck.", [], 42)
+        self.drp_stored_deck = Changeable_OptionMenu(self.frm_deck_selection, "Select deck.", [], 48)
 
         # Buttons.
-        self.btn_import = tk.Button(master=self.frm_deck_selection, text="IMPORT", command=self.controller.on_deck_import)
-        self.btn_delete = tk.Button(master=self.frm_deck_selection, text="DELETE", command=self.controller.on_deck_delete)
+        self.btn_import = tk.Button(master=self.frm_deck_selection, text="IMPORT", width=10, command=self.controller.on_deck_import)
+        self.btn_delete = tk.Button(master=self.frm_deck_selection, text="DELETE", width=10, command=self.controller.on_deck_delete)
 
         # Arrange everything.
-        lbl_deck_selection.grid(row=0, column=0, padx=1, pady=10, sticky="w")
-        lbl_deck_import.grid(row=1, column=0, padx=1, pady=1, sticky="w")
-        lbl_stored_deck.grid(row=2, column=0, padx=1, pady=1, sticky="w")
+        lbl_deck_selection.grid(row=0, column=0, columnspan=3, padx=4, pady=10, sticky="w")
+        lbl_deck_import.grid(row=1, column=0, padx=4, pady=4, sticky="w")
+        lbl_stored_deck.grid(row=2, column=0, padx=4, pady=4, sticky="w")
 
-        self.ent_deck_import.grid(row=1, column=1, padx=1, pady=1, sticky="w")
+        self.ent_deck_import.grid(row=1, column=1, padx=4, pady=4, sticky="w")
 
-        self.drp_stored_deck.get_OptionMenu_class().grid(row=2, column=1, padx=1, pady=1, sticky="w")
+        self.drp_stored_deck.get_OptionMenu_class().grid(row=2, column=1, padx=4, pady=4, sticky="w")
 
-        self.btn_import.grid(row=1, column=2, padx=20, pady=1)
-        self.btn_delete.grid(row=2, column=2, padx=1, pady=1)
+        self.btn_import.grid(row=1, column=2, padx=4, pady=4)
+        self.btn_delete.grid(row=2, column=2, padx=1, pady=4)
         
         ###################################################################################################################################################
 
         # Initialize calculation section.
 
         self.frm_calculation = tk.Frame(master=self.frm_top, relief=tk.RIDGE, borderwidth=5)
-        self.frm_calculation.grid(row=0, column=1, padx=5, pady=5)
+        self.frm_calculation.grid(row=0, column=1, padx=4, pady=4)
 
         # Labels.
-        lbl_initialize_calculation = tk.Label(master=self.frm_calculation, text="Initialize Calculation", height=1, font=("Helvetica", "11", "bold"))
-        lbl_sample_size = tk.Label(master=self.frm_calculation, text="Sample size:", height=1, width=15, anchor="w")
+        lbl_initialize_calculation = tk.Label(master=self.frm_calculation, text="Initialize Calculation", width=26, height=1, anchor="w", font=("Helvetica", "11", "bold"))
+        lbl_sample_size = tk.Label(master=self.frm_calculation, text="Sample size:", height=1, width=10, anchor="w")
 
         # Entries.
         self.ent_sample_size = tk.Entry(master=self.frm_calculation, width=12, validate="key")
         self.ent_sample_size.configure(validatecommand=(self.ent_sample_size.register(self.validate),'%d', '%P'))
 
         # Buttons.
-        self.btn_add_pool = tk.Button(master=self.frm_calculation, text="+ POOL", command=self.controller.on_add_pool)
-        self.btn_calculate = tk.Button(master=self.frm_calculation, text="CALCULATE", command=self.controller.on_calculate)
+        self.btn_calculate = tk.Button(master=self.frm_calculation, text="CALCULATE", width=10, command=self.controller.on_calculate)
+        self.btn_add_pool = tk.Button(master=self.frm_calculation, text="+ POOL", width=10, command=self.controller.on_add_pool)
+        self.btn_del_pool = tk.Button(master=self.frm_calculation, text="- POOL", width=10, command=self.controller.on_del_pool)
+        self.btn_clear = tk.Button(master=self.frm_calculation, text="CLEAR", width=10, command=self.on_clear)
 
         # Arrange everything.
-        lbl_initialize_calculation.grid(row=0, column=0, padx=1, pady=10, sticky="w")
-        lbl_sample_size.grid(row=1, column=0, padx=1, pady=4, sticky="w")
+        lbl_initialize_calculation.grid(row=0, column=0, columnspan = 3, padx=4, pady=10, sticky="w")
+        lbl_sample_size.grid(row=1, column=0, padx=4, pady=4, sticky="w")
 
-        self.ent_sample_size.grid(row=1, column=1, padx=1, pady=4)
+        self.ent_sample_size.grid(row=1, column=1, padx=4, pady=4, sticky="w")
 
-        self.btn_add_pool.grid(row=2, column=0, padx=4, pady=4, sticky="w")
-        self.btn_calculate.grid(row=2, column=1, padx=10, pady=4, sticky="e")
+        self.btn_calculate.grid(row=1, column=2, padx=4, pady=5, sticky="e")
+        self.btn_add_pool.grid(row=2, column=0, padx=4, pady=5, sticky="w")
+        self.btn_del_pool.grid(row=2, column=1, padx=4, pady=5, sticky="w")
+        self.btn_clear.grid(row=2, column=2, padx=4, pady=5, sticky="w")
+        
+        
         
         ###################################################################################################################################################
 
@@ -268,7 +274,12 @@ class View(tk.Tk, Observer):
 
             self.add_pool_display()
 
-        
+        elif update_event == "del pool":                      # Deletes the last pool in the pool list.
+            
+            if self.pool_list != []:
+                self.pool_list[-1].get_frame().destroy()      # Deletes the display of the card pool.
+                self.pool_list.pop(-1)                        # Deletes the card pool entirely.
+
         elif update_event == "add card to pool":              # Card was added to a pool.
 
             for pool in self.pool_list:                                         # Update list for add (cards that are not in any pool).
@@ -316,7 +327,7 @@ class View(tk.Tk, Observer):
         elif update_event == "end calculte":                # Share the result with the user.
 
             popup_result = tk.Toplevel()                                        # Create a popup window.
-            popup_result.geometry("380x70")                                     # Set size.
+            popup_result.geometry("390x70")                                     # Set size.
             popup_result.resizable(False, False)                                # Lock size.
             x = self.winfo_x()
             y = self.winfo_y()
@@ -363,3 +374,11 @@ class View(tk.Tk, Observer):
     
     def get_frm_bottom(self):
         return self.scb_frm_bottom.get_frame()
+
+    def on_clear(self):
+        '''
+        Special event handler that is partially defined outside of the Controller.
+        Closes the window.
+        '''
+        self.destroy()                          # Close this window.
+        self.controller.on_clear()              # Open the on_clear() function of the controller.

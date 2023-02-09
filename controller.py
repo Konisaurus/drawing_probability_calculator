@@ -3,6 +3,7 @@ This module defines the Controll class.
 '''
 
 # Imports.
+import copy
 from model_hypgeo import Model_Hypgeo
 from view import View
 
@@ -12,15 +13,15 @@ class Controller:
     Controlls the interaction from the user with the View and Model class.
     '''
     def __init__(self):
-        self.model = Model_Hypgeo()         # Model of the system, contains logic aspects.
-        self.view = View(self.model, self)  # View of the system, contians visual aspects.
+        self.model = copy.deepcopy(Model_Hypgeo())  # Model of the system, contains logic aspects.
+        self.view = View(self.model, self)          # View of the system, contians visual aspects.
 
     # Event handlers.
     def on_deck_import(self):
         '''
         Adds a deck to the "Deck Selection" dropdown menu.
 
-        NOT IMPLEMENTED YET
+        NOT YET IMPLEMENTED
         '''
         pass
 
@@ -28,7 +29,7 @@ class Controller:
         '''
         Deletes a deck from the "Deck Selection" dropdown menu.
 
-        NOT IMPLEMENTED YET
+        NOT YET IMPLEMENTED
         '''
         pass
 
@@ -38,6 +39,23 @@ class Controller:
         '''
         self.model.get_deck_manager().add_pool()
                
+    def on_del_pool(self):
+        '''
+        Deletes a pool in the models self.deck_manager
+
+        NOT YET IMPLEMENTED
+        '''
+        self.model.get_deck_manager().del_pool()
+
+    def on_clear(self):
+        '''
+        Resets everthing to the initial state.
+
+        NOT YET IMPLEMENTED
+        '''
+        self.model = copy.deepcopy(Model_Hypgeo())      # Create a new model.
+        self.view = View(self.model, self)              # Create a new view.
+
     def on_calculate(self):
         '''
         Calculate the probability of drawing the hand the user set up.

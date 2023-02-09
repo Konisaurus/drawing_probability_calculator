@@ -94,11 +94,14 @@ if __name__ == "__main__":
     hypgeo = Model_Hypgeo()
     
     hypgeo.set_deck_manager(deck)
-    hypgeo.get_deck_manager().set_sample_size(0)
+    hypgeo.get_deck_manager().set_sample_size(5)
 
     hypgeo.get_deck_manager().add_pool()
     hypgeo.get_deck_manager().add_card_to_pool(0, 'Kashtira Fenrir')
-    hypgeo.get_deck_manager().set_pool_slot_size(0, 0)
+    hypgeo.get_deck_manager().set_pool_slot_size(0, 1)
     hypgeo.get_deck_manager().set_pool_only_equal(0, False)
 
-    print(hypgeo.calculate())
+    hypgeo.get_deck_manager().del_pool()
+
+    hypgeo.calculate()
+    print(hypgeo.result)

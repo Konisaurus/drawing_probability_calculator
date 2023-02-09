@@ -137,9 +137,8 @@ class Deck_Manager:
         self.sample_size = sample_size                     # Number of cards that are drawn in a sample hand.
         self.defined_pools = defined_pools                 # List of different card pools.
         self.unassigned_cards = None                       # Dict of cards that are in no card pool.
-        self.set_unassigned_cards()                        # Set self.unassigned_cards.         
         self.unassigned_card_count = None                  # Number of card copies that are not assigned to any pool.
-        self.set_unassigned_card_count()                   # Set self.unassigned_card_count.
+        self.set_unassigned_cards()                        # Set self.unassigned_cards.
     
     def calculate_deck_size(self):
         '''
@@ -173,6 +172,7 @@ class Deck_Manager:
                     for card in pool.get_card_names():
                         unassigned_cards.pop(card)
         self.unassigned_cards = unassigned_cards
+        self.set_unassigned_card_count()                    # Update self.unassigned_card_count, because we unassigned a card.
     
     def set_unassigned_card_count(self):
         '''
@@ -206,6 +206,19 @@ class Deck_Manager:
         self.defined_pools.append(copy.deepcopy(Pool_Manager(self)))
         self.model.notify("add pool")                                        # Use notify() method of model, because this change is noticable in the View class.
 
+    def del_pool(self):
+        '''
+        Deletes the newest card pool.
+        '''
+        if self.defined_pools != []:
+            pool = self.defined_pools[-1]
+            for card in pool.get_card_names():
+                pool.del_card(card, self.main_dict, self.sample_size)
+                
+            self.defined_pools.pop(-1)
+            self.set_unassigned_cards()
+            self.model.notify("del pool")
+
     def add_card_to_pool(self, index, card_name):
         '''
         Adds a card_name to a pool in self.defined_pools with index.
@@ -213,7 +226,6 @@ class Deck_Manager:
         self.defined_pools[index].add_card(card_name, self.main_dict, self.sample_size)
 
         self.set_unassigned_cards()                                          # Update self.unassigned_cards, because we assigned a card.
-        self.set_unassigned_card_count()                                     # Update self.unassigned_card_count, because we assigned a card.
 
         self.model.notify("add card to pool", index, card_name)              # Use notify() method of model, because this change is noticable in the View class.
 
@@ -224,7 +236,6 @@ class Deck_Manager:
         self.defined_pools[index].del_card(card_name, self.main_dict, self.sample_size)
 
         self.set_unassigned_cards()                                         # Update self.unassigned_cards, because we unassigned a card.
-        self.set_unassigned_card_count()                                    # Update self.unassigned_card_count, because we unassigned a card.
 
         self.model.notify("removed card from pool", index, card_name)       # Use notify() method of model, because this change is noticable in the View class.
 
