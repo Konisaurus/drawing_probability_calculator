@@ -17,7 +17,7 @@ class Controller:
         self.model = copy.deepcopy(Model_Hypgeo())  # Model of the system, contains logic aspects.
         self.view = View(self.model, self)          # View of the system, contians visual aspects.
 
-    # Event handlers which interact mainly with the storage.
+    # Event handlers for "Deck Selection".
     def on_deck_import(self, path):
         '''
         Adds a deck to the storage for calculations.
@@ -36,45 +36,44 @@ class Controller:
                 deck_storage = deck_storage | deck                                          # Add the deck to the storage dict.
                 with open("deck_storage.json", "w") as write_storage:                       # Save the new storage.
                     json.dump(deck_storage, write_storage, indent=4, separators=(",",":"))
-                return True                                                                 # Something has changed, so the model must iniciate further steps.
+                return True                                                                 # Something has changed, so view must display something new.
             else:
-                ######################################################################################################################################################################################################################################################
-                ######################################################################################################################################################################################################################################################
-                # do popup
-                ######################################################################################################################################################################################################################################################
-                ######################################################################################################################################################################################################################################################
-                return False
+                return "file not valid"
         except:
-            ######################################################################################################################################################################################################################################################
-            ######################################################################################################################################################################################################################################################
-            # do popup
-            ######################################################################################################################################################################################################################################################
-            ######################################################################################################################################################################################################################################################
-            return False
+            return "file not found"
 
-    def on_deck_delete(self):
+    def on_deck_delete(self, key):
         '''
         Deletes a deck from the "Deck Selection" dropdown menu.
-
-        NOT YET IMPLEMENTED
         '''
-        pass
+        if key == "Select deck.":
+            return False
+        else:
+            with open("deck_storage.json", "r") as read_storage:                            # Open the deck storage.
+                deck_storage = json.load(read_storage)
+            
+            deck_storage.pop(key)                                                           # Delete the deck.
+
+            with open("deck_storage.json", "w") as write_storage:                           # Update the storage
+                json.dump(deck_storage, write_storage, indent=4, separators=(",",":"))
+            return True                                                                     # Something has changed, so view must display something new.
     
-    def on_drp_deck_changed(self, deck):
+    def on_drp_deck_changed(self, key):
         '''
         Set the new deck as the deck manager of the model.
         '''
-        if deck == "Select deck.":
+        if key == "Select deck.":
             pass
         else:
-            self.model.set_deck_manager(deck)
+            self.model.set_deck_manager(key)
 
-    # Event handlers which interact mainly with the model.
+    # Event handlers for "Initialize Calculation".
     def on_add_pool(self):
         '''
         Create a pool in the models self.deck_manager
         '''
-        self.model.get_deck_manager().add_pool()
+        if self.validate_deck():
+            self.model.get_deck_manager().add_pool()
                
     def on_del_pool(self):
         '''
@@ -82,7 +81,8 @@ class Controller:
 
         NOT YET IMPLEMENTED
         '''
-        self.model.get_deck_manager().del_pool()
+        if self.validate_deck():
+            self.model.get_deck_manager().del_pool()
 
     def on_clear(self):
         '''
@@ -97,8 +97,10 @@ class Controller:
         '''
         Calculate the probability of drawing the hand the user set up.
         '''
-        self.model.calculate()
+        if self.validate_deck():
+            self.model.calculate()
 
+    # Event handlers for "Card Pool".
     def on_add_card(self, index, card_name):
         '''
         Assigns a card to a pool.
@@ -128,6 +130,7 @@ class Controller:
         else:
             self.model.get_deck_manager().set_pool_only_equal(index, True)
 
+    # Other event handlers.
     def on_set_deck_manager(self, key):
         '''
         Sets the for the calculations.
@@ -141,7 +144,7 @@ class Controller:
         '''
         Checks if a deck is selected.
         '''
-        if self.model.get_deck_manager == None:
+        if self.model.get_deck_manager() == None:
             return False
         else:
             return True

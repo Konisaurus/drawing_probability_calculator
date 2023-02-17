@@ -195,7 +195,7 @@ class View(tk.Tk, Observer):
 
         # Buttons.
         self.btn_import = tk.Button(master=self.frm_deck_selection, text="IMPORT", width=10, command=self.on_deck_import)
-        self.btn_delete = tk.Button(master=self.frm_deck_selection, text="DELETE", width=10, command=self.controller.on_deck_delete)
+        self.btn_delete = tk.Button(master=self.frm_deck_selection, text="DELETE", width=10, command=self.on_deck_delete)
 
         # Arrange everything.
         lbl_deck_selection.grid(row=0, column=0, columnspan=3, padx=4, pady=10, sticky="w")
@@ -390,6 +390,23 @@ class View(tk.Tk, Observer):
                 key = list(json.load(read_deck))[0]
                 self.drp_stored_decks.append_item(key)
 
+        elif check == "file not valid":
+            self.error_popup("ERROR: file is not a valid deck.")
+
+        elif check == "file not found":
+            self.error_popup("ERROR: file not found.")
+
+    def on_deck_delete(self):
+        '''
+        Special event handler that is partially defined outside of the Controller.
+        Depending on the actions of the deck controller, delete a deck name 
+        (which is the key of the deck in deck_storage.json) from the deck dropdown.
+        '''
+        check = self.controller.on_deck_delete(self.drp_stored_decks.get_variable_value())
+
+        if check == True:
+            self.drp_stored_decks.update_options()
+
     def validate(self, type_of_action, entry_value):
         '''
         Validate function that only allows integers as inserts in entries.
@@ -413,3 +430,20 @@ class View(tk.Tk, Observer):
             for i in range(len(self.pool_list)):            # Remove all displays from the old deck.
                 self.controller.on_del_pool()
             self.controller.on_set_deck_manager(key)        # Set new deck.
+
+    def error_popup(self, text):
+            popup_error = tk.Toplevel()                                         # Create a popup window.
+            popup_error.geometry("390x50")                                      # Set size.
+            popup_error.resizable(False, False)                                 # Lock size.
+            x = self.winfo_x()
+            y = self.winfo_y()
+            popup_error.geometry("+%d+%d" %(x+225,y+200))                       # Center the popup in front of the main window.
+            popup_error.grab_set()                                              # "Freezes" the main window until the popup is closed.
+
+            # Label.
+            lbl_error = tk.Label(master=popup_error, text=text, height=1, font=("Helvetica", "11", "bold"), anchor="center")
+
+            # Arrange everything.
+            lbl_error.pack(padx=15, pady=15)
+
+            popup_error.mainloop()
