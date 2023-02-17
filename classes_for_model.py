@@ -10,23 +10,6 @@ It contains the following classes:
 # Imports.
 import copy
 
-# Classes.
-class Deck:
-    '''
-    Class for storing deck information.
-    '''
-    def __init__(self, deck_name, main_deck):
-        self.name = deck_name       # Name of the deck.
-        self.main = main_deck       # The actual deck as a dict.
-
-    # Getter functions.
-    def get_name(self):
-        return self.name
-    
-    def get_main(self):
-        return self.main
-
-
 class Pool_Manager:
     '''
     Class for managing a pool of cards. In a calculation, all cards in one pool are treated the same; they are one unit.
@@ -129,8 +112,7 @@ class Deck_Manager:
         self.model = model
 
         # These attributes should always stay the same for one particular deck.
-        self.deck_name = deck.get_name()                   # Deck name.
-        self.main_dict = deck.get_main()                   # Main deck as a dictionary, main_dict = {"card1": int(number of card1 in deck), ... , "cardX": int(number of cardX in deck)}.
+        self.main_dict = deck                              # Main deck as a dictionary, main_dict = {"card1": int(number of card1 in deck), ... , "cardX": int(number of cardX in deck)}.
         self.deck_size = self.calculate_deck_size()        # Number of card copies in deck.
 
         # can be changed

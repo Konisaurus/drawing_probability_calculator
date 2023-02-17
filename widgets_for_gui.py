@@ -47,6 +47,9 @@ class Changeable_OptionMenu():
         return self.option_menu
     
     def get_variable(self):
+        return self.variable
+    
+    def get_variable_value(self):
         return self.variable.get()
 
 

@@ -20,18 +20,6 @@ class Model_Hypgeo(Subject):
         self.deck_manager = None    # Deck which is used for calculations.
         self.result = None          # Store the result of the last calculation.
 
-        # marked section is only for testing
-        # will be deleted after everything is done correctly
-        ###########################################################################################################################################
-        deck = Deck("Traptrix-Rikka", 
-            {'Kashtira Fenrir': 3, 'Mudan the Rikka Fairy': 1, 'Traptrix Myrmeleo': 3, 'Traptrix Mantis': 2, 'Traptrix Dionaea': 1, \
-            'Traptrix Vesiculo': 1, 'Traptrix Arachnocampa': 1, 'Traptrix Pudica': 1, 'Primula the Rikka Fairy': 1, 'Rikka Princess': 3, \
-            'Rikka Glamour': 3, 'Rikka Konkon': 2, 'Traptrix Orchard': 1, 'Called by the Grave': 1, 'Time-Space Trap Hole': 1, \
-            'Delusion Trap Hole': 1, 'Bottomless Trap Hole': 1, 'Infinite Impermanence': 3, "Ice Dragon's Prison": 2, \
-            'Rikka Sheet': 2, 'Traptrix Holetaea': 3, 'The Phantom Knights of Shade Brigandine': 3})
-        self.set_deck_manager(deck)
-        ###########################################################################################################################################
-
     def calculate(self):
         '''
         Calculate the probability of drawing the configured hand in the deck_manager() and return it.
@@ -84,12 +72,11 @@ class Model_Hypgeo(Subject):
 
 # Testing this model class.
 if __name__ == "__main__":
-    deck = Deck("Traptrix-Rikka", 
-            {'Kashtira Fenrir': 3, 'Mudan the Rikka Fairy': 1, 'Traptrix Myrmeleo': 3, 'Traptrix Mantis': 2, 'Traptrix Dionaea': 1, \
+    deck = {'Kashtira Fenrir': 3, 'Mudan the Rikka Fairy': 1, 'Traptrix Myrmeleo': 3, 'Traptrix Mantis': 2, 'Traptrix Dionaea': 1, \
             'Traptrix Vesiculo': 1, 'Traptrix Arachnocampa': 1, 'Traptrix Pudica': 1, 'Primula the Rikka Fairy': 1, 'Rikka Princess': 3, \
             'Rikka Glamour': 3, 'Rikka Konkon': 2, 'Traptrix Orchard': 1, 'Called by the Grave': 1, 'Time-Space Trap Hole': 1, \
             'Delusion Trap Hole': 1, 'Bottomless Trap Hole': 1, 'Infinite Impermanence': 3, "Ice Dragon's Prison": 2, \
-            'Rikka Sheet': 2, 'Traptrix Holetaea': 3, 'The Phantom Knights of Shade Brigandine': 3})
+            'Rikka Sheet': 2, 'Traptrix Holetaea': 3, 'The Phantom Knights of Shade Brigandine': 3}
         
     hypgeo = Model_Hypgeo()
     
@@ -100,8 +87,6 @@ if __name__ == "__main__":
     hypgeo.get_deck_manager().add_card_to_pool(0, 'Kashtira Fenrir')
     hypgeo.get_deck_manager().set_pool_slot_size(0, 1)
     hypgeo.get_deck_manager().set_pool_only_equal(0, False)
-
-    hypgeo.get_deck_manager().del_pool()
 
     hypgeo.calculate()
     print(hypgeo.result)

@@ -4,17 +4,18 @@ This module contains the View class which contains all the visual aspects of the
 
 # Imports.
 import tkinter as tk
+import json
 from widgets_for_gui import *
 from observer_subject import Observer
 from model_hypgeo import *
 
 # Name convetions for all tkinter widgets:
 #
-# Label 	                lbl 
-# Button 	                btn 
-# Entry 	                ent 
-# Text 	                    txt 
-# Frame 	                frm 
+# Label 	                lbl
+# Button 	                btn
+# Entry 	                ent
+# Text 	                    txt
+# Frame 	                frm
 # Canvas                    cnv
 # Scrollbar                 scb
 # Changeable_OptionMenu     drp (short for dropdown)
@@ -42,19 +43,19 @@ class Pool_Section:
         lbl_title = tk.Label(master=self.frame, text="Card Pool", height=1, width=42, font=("Helvetica", "11", "bold"), anchor="nw")
         lbl_add_card = tk.Label(master=self.frame, text="Add card:", anchor="nw")
         lbl_del_card = tk.Label(master=self.frame, text="Delete card:", anchor="nw")
-        self.lbl_size = tk.Label(master=self.frame, text="Minimum pool size:", anchor="nw", width=15)
+        self.lbl_size = tk.Label(master=self.frame, text="Min. in sample:", anchor="nw", width=15)
 
         # Dropdownlists.
         self.drp_add_card = Changeable_OptionMenu(self.frame, "Select card.", self.view.get_model().get_deck_manager().get_unassigned_cards(), 22)
         self.drp_del_card = Changeable_OptionMenu(self.frame, "Select card.", [], 22)
 
         # Buttons.
-        self.btn_add_card = tk.Button(master=self.frame, text="+ CARD", width=10, command= lambda: self.view.get_controller().on_add_card(self.index, self.drp_add_card.get_variable()))
-        self.btn_del_card = tk.Button(master=self.frame, text="- CARD", width=10, command= lambda: self.view.get_controller().on_del_card(self.index, self.drp_del_card.get_variable()))
-        self.btn_change_type = tk.Button(master=self.frame, text="CHANGE", width=10, command= lambda: self.view.get_controller().on_change_type(self.index))
+        self.btn_add_card = tk.Button(master=self.frame, text="+ CARD", width=10, command=lambda: self.view.get_controller().on_add_card(self.index, self.drp_add_card.get_variable_value()))
+        self.btn_del_card = tk.Button(master=self.frame, text="- CARD", width=10, command=lambda: self.view.get_controller().on_del_card(self.index, self.drp_del_card.get_variable_value()))
+        self.btn_change_type = tk.Button(master=self.frame, text="CHANGE", width=10, command=lambda: self.view.get_controller().on_change_type(self.index))
 
         # Entries.
-        self.ent_min_size = tk.Entry(master=self.frame, width=29, validate="key")
+        self.ent_min_size = tk.Entry(master=self.frame, width=3, validate="key", justify="right")
         self.ent_min_size.configure(validatecommand=(self.ent_min_size.register(self.view.validate),'%d', '%P'))
 
         # Arrange everything.
@@ -72,7 +73,7 @@ class Pool_Section:
         self.btn_del_card.grid(row=3, column=2, padx=4, pady=4, sticky="w")
         self.btn_change_type.grid(row=4, column=2, padx=4, pady=4, sticky="w")
 
-        self.ent_min_size.grid(row=4, column=1, padx=4, pady=4, sticky="w")
+        self.ent_min_size.grid(row=4, column=1, padx=4, pady=4)
         
     # Setter functions.
     def set_index(self):
@@ -87,10 +88,10 @@ class Pool_Section:
         There are only two types, so it always changes to the other type.
         '''
         state = self.lbl_size["text"]
-        if state == "Minimum pool size:":
-            self.lbl_size.config(text="Exact pool size:")
+        if state == "Min. in sample:":
+            self.lbl_size.config(text="Exact in sample:")
         else:
-            self.lbl_size.config(text="Minimum pool size:")
+            self.lbl_size.config(text="Min. in sample:")
 
     def set_card_display_text(self):
         '''
@@ -146,7 +147,7 @@ class View(tk.Tk, Observer):
     '''
     def __init__(self, model, controller):
         
-        # Interaction with the model and the controller.
+        # Interaction with the model, the storage and the controller.
 
         self.model = model              # Which model should be observed.
         self.model.attach(self)         # Attach to this model.
@@ -184,10 +185,16 @@ class View(tk.Tk, Observer):
         self.ent_deck_import = tk.Entry(master=self.frm_deck_selection, width=55)
 
         # Dropdownlists.
-        self.drp_stored_deck = Changeable_OptionMenu(self.frm_deck_selection, "Select deck.", [], 48)
+        try:                                                            # Get all deck keys for displaying the decks in the selection.
+            with open("deck_storage.json", "r") as read_storage:
+                deck_keys = list(json.load(read_storage).keys())
+        except:                                                         # When the storage is empty, set an empty list.
+            deck_keys = []
+        self.drp_stored_decks = Changeable_OptionMenu(self.frm_deck_selection, "Select deck.",  deck_keys, 48)
+        self.drp_stored_decks.get_variable().trace("w", self.deck_changed_callback)        # Set callback function.
 
         # Buttons.
-        self.btn_import = tk.Button(master=self.frm_deck_selection, text="IMPORT", width=10, command=self.controller.on_deck_import)
+        self.btn_import = tk.Button(master=self.frm_deck_selection, text="IMPORT", width=10, command=self.on_deck_import)
         self.btn_delete = tk.Button(master=self.frm_deck_selection, text="DELETE", width=10, command=self.controller.on_deck_delete)
 
         # Arrange everything.
@@ -197,7 +204,7 @@ class View(tk.Tk, Observer):
 
         self.ent_deck_import.grid(row=1, column=1, padx=4, pady=4, sticky="w")
 
-        self.drp_stored_deck.get_OptionMenu_class().grid(row=2, column=1, padx=4, pady=4, sticky="w")
+        self.drp_stored_decks.get_OptionMenu_class().grid(row=2, column=1, padx=4, pady=4, sticky="w")
 
         self.btn_import.grid(row=1, column=2, padx=4, pady=4)
         self.btn_delete.grid(row=2, column=2, padx=1, pady=4)
@@ -214,7 +221,7 @@ class View(tk.Tk, Observer):
         lbl_sample_size = tk.Label(master=self.frm_calculation, text="Sample size:", height=1, width=10, anchor="w")
 
         # Entries.
-        self.ent_sample_size = tk.Entry(master=self.frm_calculation, width=12, validate="key")
+        self.ent_sample_size = tk.Entry(master=self.frm_calculation, width=3, validate="key", justify="right")
         self.ent_sample_size.configure(validatecommand=(self.ent_sample_size.register(self.validate),'%d', '%P'))
 
         # Buttons.
@@ -227,7 +234,7 @@ class View(tk.Tk, Observer):
         lbl_initialize_calculation.grid(row=0, column=0, columnspan = 3, padx=4, pady=10, sticky="w")
         lbl_sample_size.grid(row=1, column=0, padx=4, pady=4, sticky="w")
 
-        self.ent_sample_size.grid(row=1, column=1, padx=4, pady=4, sticky="w")
+        self.ent_sample_size.grid(row=1, column=1, padx=4, pady=4)
 
         self.btn_calculate.grid(row=1, column=2, padx=4, pady=5, sticky="e")
         self.btn_add_pool.grid(row=2, column=0, padx=4, pady=5, sticky="w")
@@ -248,19 +255,6 @@ class View(tk.Tk, Observer):
 
         self.eval('tk::PlaceWindow . center')
         self.mainloop()
-
-    # Validate function 
-    def validate(self, type_of_action, entry_value):
-        '''
-        Validate function that only allows integers as inserts in entries.
-        '''
-        if type_of_action == '1':           # '1' is insert
-            if not entry_value.isdigit():
-                return False
-            else:
-                return True
-        else:
-            return True
         
     # Update functions.
     def update(self, update_event, index = None, card_name = None):
@@ -311,7 +305,7 @@ class View(tk.Tk, Observer):
 
             self.model.get_deck_manager().set_sample_size(int(sample_size))     # Set the sample_size in the model.
             
-            for index in range(len(self.pool_list)):                            # Because the sample_size changed, all slot_sizes of the pools must be updated.   
+            for index in range(len(self.pool_list)):                            # Because the sample_size changed, all slot_sizes of the pools must be updated.
                 min_size = self.pool_list[index].get_min_size()    
 
                 if min_size == '':                                              # If the user did not enter anything, set to 0.
@@ -335,7 +329,7 @@ class View(tk.Tk, Observer):
             popup_result.grab_set()                                             # "Freezes" the main window until the popup is closed.
 
             # Labels
-            lbl_result_text = tk.Label(master=popup_result, text="The probability p of drawing the above configuration is:", height=1, font=("Helvetica", "11"), anchor="nw")
+            lbl_result_text = tk.Label(master=popup_result, text="The probability p of drawing this configuration is:", height=1, font=("Helvetica", "11"), anchor="nw")
             result = "p = " + str(self.model.get_result())
             lbl_result = tk.Label(master=popup_result, text=result, height=1, font=("Helvetica", "11", "bold"), anchor="nw")
             
@@ -348,7 +342,7 @@ class View(tk.Tk, Observer):
         elif update_event == "changed only equal":            # Change the pool type display.
             self.pool_list[index].set_pool_type()
 
-    # Managing pools            
+    # Managing pools.
     def add_pool_display(self):
         '''
         Creates a new Pool_Display and adds it to the pool_list.
@@ -365,16 +359,17 @@ class View(tk.Tk, Observer):
     # Getter functions.
     def get_model(self):
         return self.model
-   
+
     def get_controller(self):
         return self.controller
-    
+
     def get_pool_list(self):
         return self.pool_list
-    
+
     def get_frm_bottom(self):
         return self.scb_frm_bottom.get_frame()
 
+    # Other functions.
     def on_clear(self):
         '''
         Special event handler that is partially defined outside of the Controller.
@@ -382,3 +377,39 @@ class View(tk.Tk, Observer):
         '''
         self.destroy()                          # Close this window.
         self.controller.on_clear()              # Open the on_clear() function of the controller.
+
+    def on_deck_import(self):
+        '''
+        Special event handler that is partially defined outside of the Controller.
+        Depending on the actions of the deck controller, append a new deck name 
+        (which is the key of the deck in deck_storage.json) to the deck dropdown.
+        '''
+        check = self.controller.on_deck_import(self.ent_deck_import.get())      # Give the value of the entry to the controller.
+        if check == True:                                                       # Controller added a new deck, so add to the display.
+            with open(self.ent_deck_import.get(), "r") as read_deck:
+                key = list(json.load(read_deck))[0]
+                self.drp_stored_decks.append_item(key)
+
+    def validate(self, type_of_action, entry_value):
+        '''
+        Validate function that only allows integers as inserts in entries.
+        '''
+        if type_of_action == '1':           # '1' is insert
+            if not entry_value.isdigit():
+                return False
+            else:
+                return True
+        else:
+            return True
+
+    def deck_changed_callback(self, *args):
+        '''
+        Callback function which sets the deck whenever the stored deck dropdown menu is changed.
+        '''
+        key = self.drp_stored_decks.get_variable_value()
+        if key == "Select deck.":
+            self.on_clear()
+        else:
+            for i in range(len(self.pool_list)):            # Remove all displays from the old deck.
+                self.controller.on_del_pool()
+            self.controller.on_set_deck_manager(key)        # Set new deck.
