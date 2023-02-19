@@ -74,21 +74,19 @@ class Controller:
         '''
         if self.validate_deck():
             self.model.get_deck_manager().add_pool()
-               
-    def on_del_pool(self):
+    
+    def on_deck_info(self):
         '''
-        Deletes a pool in the models self.deck_manager
+        Opens an extra window that shows the entire deck with
+        neccessary information about each card.
 
         NOT YET IMPLEMENTED
         '''
-        if self.validate_deck():
-            self.model.get_deck_manager().del_pool()
+        pass
 
     def on_clear(self):
         '''
         Resets everthing to the initial state.
-
-        NOT YET IMPLEMENTED
         '''
         self.model = copy.deepcopy(Model_Hypgeo())  # Create a new model.
         self.view = View(self.model, self)          # Create a new view.
@@ -101,6 +99,13 @@ class Controller:
             self.model.calculate()
 
     # Event handlers for "Card Pool".
+    def on_del_pool(self, index):
+        '''
+        Deletes a pool in the models self.deck_manager
+        '''
+        if self.validate_deck():
+            self.model.get_deck_manager().del_pool(index)
+
     def on_add_card(self, index, card_name):
         '''
         Assigns a card to a pool.
@@ -118,17 +123,6 @@ class Controller:
             pass
         else:                               # Assign the selected card.
             self.model.get_deck_manager().del_card_in_pool(index, card_name)
-
-    def on_change_type(self, index):
-        '''
-        Changes the type of a pool. 
-        There are only two states, so it always switches to the other.
-        The two states are X == x or X <= x.
-        '''
-        if self.model.get_deck_manager().get_pools()[index].get_only_equal() == True:
-            self.model.get_deck_manager().set_pool_only_equal(index, False)
-        else:
-            self.model.get_deck_manager().set_pool_only_equal(index, True)
 
     # Other event handlers.
     def on_set_deck_manager(self, key):

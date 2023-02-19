@@ -43,7 +43,10 @@ class Pool_Section:
         lbl_title = tk.Label(master=self.frame, text="Card Pool", height=1, width=42, font=("Helvetica", "11", "bold"), anchor="nw")
         lbl_add_card = tk.Label(master=self.frame, text="Add card:", anchor="nw")
         lbl_del_card = tk.Label(master=self.frame, text="Delete card:", anchor="nw")
-        self.lbl_size = tk.Label(master=self.frame, text="Min. in sample:", anchor="nw", width=15)
+        lbl_in_sample = tk.Label(master=self.frame, text="In sample (success):", anchor="nw", width=15)
+        lbl_min = tk.Label(master=self.frame, text="min.", anchor="nw", width=3)
+        lbl_bewtween = tk.Label(master=self.frame, text="-", anchor="nw", width=2)
+        lbl_max = tk.Label(master=self.frame, text="max.", anchor="nw", width=4)
 
         # Dropdownlists.
         self.drp_add_card = Changeable_OptionMenu(self.frame, "Select card.", self.view.get_model().get_deck_manager().get_unassigned_cards(), 22)
@@ -52,28 +55,34 @@ class Pool_Section:
         # Buttons.
         self.btn_add_card = tk.Button(master=self.frame, text="+ CARD", width=10, command=lambda: self.view.get_controller().on_add_card(self.index, self.drp_add_card.get_variable_value()))
         self.btn_del_card = tk.Button(master=self.frame, text="- CARD", width=10, command=lambda: self.view.get_controller().on_del_card(self.index, self.drp_del_card.get_variable_value()))
-        self.btn_change_type = tk.Button(master=self.frame, text="CHANGE", width=10, command=lambda: self.view.get_controller().on_change_type(self.index))
+        self.btn_del_pool = tk.Button(master=self.frame, text="- POOL", width=10, command=lambda: self.view.get_controller().on_del_pool(self.index))
 
         # Entries.
-        self.ent_min_size = tk.Entry(master=self.frame, width=3, validate="key", justify="right")
-        self.ent_min_size.configure(validatecommand=(self.ent_min_size.register(self.view.validate),'%d', '%P'))
+        self.ent_min_in_sample = tk.Entry(master=self.frame, width=3, validate="key", justify="right")
+        self.ent_min_in_sample.configure(validatecommand=(self.ent_min_in_sample.register(self.view.validate),'%d', '%P'))
+        self.ent_max_in_sample = tk.Entry(master=self.frame, width=3, validate="key", justify="right")
+        self.ent_max_in_sample.configure(validatecommand=(self.ent_min_in_sample.register(self.view.validate),'%d', '%P'))
 
         # Arrange everything.
-        self.lbl_card_display.grid(row=1, column=0, columnspan=3, padx=4, pady=4, sticky="nw")
+        self.lbl_card_display.grid(row=1, column=0, columnspan=7, padx=4, pady=4, sticky="nw")
 
-        lbl_title.grid(row=0, column=0, columnspan=3, padx=4, pady=10, sticky="w")
+        lbl_title.grid(row=0, column=0, columnspan=7, padx=4, pady=10, sticky="w")
         lbl_add_card.grid(row=2, column=0, padx=4, pady=4, sticky="w")
         lbl_del_card.grid(row=3, column=0, padx=4, pady=4, sticky="w")
-        self.lbl_size.grid(row=4, column=0, padx=4, pady=4, sticky="w")
+        lbl_in_sample.grid(row=4, column=0, padx=4, pady=4, sticky="w")
+        lbl_min.grid(row=4, column=1, pady=4, sticky="e")
+        lbl_bewtween.grid(row=4, column=3, pady=4, sticky="e")
+        lbl_max.grid(row=4, column=4, pady=4, sticky="e")
 
-        self.drp_add_card.get_OptionMenu_class().grid(row=2, column=1, padx=4, pady=4, sticky="w")
-        self.drp_del_card.get_OptionMenu_class().grid(row=3, column=1, padx=4, pady=4, sticky="w")
+        self.drp_add_card.get_OptionMenu_class().grid(row=2, column=1, columnspan=5, padx=4, pady=4, sticky="w")
+        self.drp_del_card.get_OptionMenu_class().grid(row=3, column=1, columnspan=5, padx=4, pady=4, sticky="w")
 
-        self.btn_add_card.grid(row=2, column=2, padx=4, pady=4, sticky="w")
-        self.btn_del_card.grid(row=3, column=2, padx=4, pady=4, sticky="w")
-        self.btn_change_type.grid(row=4, column=2, padx=4, pady=4, sticky="w")
+        self.btn_add_card.grid(row=2, column=6, padx=4, pady=4, sticky="w")
+        self.btn_del_card.grid(row=3, column=6, padx=4, pady=4, sticky="w")
+        self.btn_del_pool.grid(row=4, column=6, padx=4, pady=4, sticky="w")
 
-        self.ent_min_size.grid(row=4, column=1, padx=4, pady=4)
+        self.ent_min_in_sample.grid(row=4, column=2, padx=4, pady=4, sticky="w")
+        self.ent_max_in_sample.grid(row=4, column=5, padx=4, pady=4, sticky="w")
         
     # Setter functions.
     def set_index(self):
@@ -82,58 +91,61 @@ class Pool_Section:
         '''
         self.index = self.view.get_pool_list().index(self)
 
-    def set_pool_type(self):
-        '''
-        Sets the type of the "Pool Section". 
-        There are only two types, so it always changes to the other type.
-        '''
-        state = self.lbl_size["text"]
-        if state == "Min. in sample:":
-            self.lbl_size.config(text="Exact in sample:")
-        else:
-            self.lbl_size.config(text="Min. in sample:")
-
     def set_card_display_text(self):
         '''
         Sets the card display of the "Pool Section".
         '''
-        text_list = "Card name \n\n"
+        text_list = "Cards in pool: \n\n"
         if self.card_names != []:                   
-            for card in self.card_names:            # Every card should be listed on a new line.
-                text_list += "- " + card + "\n"
-        else:                                       # If there are no cards in this pool, state this.
-            text_list += "No cards in pool."
+            for card in self.card_names:                            # Every card should be listed on a new line.
+                text_list += str(card[0]) + "x " + card[1] + "\n"
+        else:                                                       # If there are no cards in this pool, state this.
+            text_list += "No cards added."
 
         self.lbl_card_display.config(text=text_list)
 
-    def set_min_size(self, min_size):
+    def set_min_in_sample(self, min_in_sample):
         '''
-        Inserts min_size into self.ent_min_size.
+        Inserts min_in_sample into self.ent_min_in_sample.
         '''
-        self.ent_min_size.delete(0, tk.END) 
-        self.ent_min_size.insert(0, min_size)
+        self.ent_min_in_sample.delete(0, tk.END) 
+        self.ent_min_in_sample.insert(0, min_in_sample)
+
+    def set_max_in_sample(self, max_in_sample):
+        '''
+        Inserts max_in_sample into self.ent_max_in_sample.
+        '''
+        self.ent_max_in_sample.delete(0, tk.END) 
+        self.ent_max_in_sample.insert(0, max_in_sample)
         
     # Managing cards.
     def add_card(self, card_name):
         '''
         Assigns a card to this pool display.
         '''
-        self.card_names.append(card_name)
-        self.set_card_display_text()                # Update the card display.
 
-    def del_card(self, card_name):
+        self.card_names.append(card_name)
+        self.set_card_display_text()                    # Update the card display.
+
+    def del_card(self, card_count, card_name):
         '''
         Unassigns a card from this pool display.
         '''
-        self.card_names.remove(card_name)
-        self.set_card_display_text()                # Update the card display.
+        self.card_names.remove([card_count, card_name])
+        self.set_card_display_text()                    # Update the card display.
 
     # Getter functions.
+    def get_index(self):
+        return self.index
+    
     def get_frame(self):
         return self.frame
     
-    def get_min_size(self):
-        return self.ent_min_size.get()
+    def get_min_in_sample(self):
+        return self.ent_min_in_sample.get()
+    
+    def get_max_in_sample(self):
+        return self.ent_max_in_sample.get()
 
     def get_drp_add_card(self):
         return self.drp_add_card
@@ -227,7 +239,7 @@ class View(tk.Tk, Observer):
         # Buttons.
         self.btn_calculate = tk.Button(master=self.frm_calculation, text="CALCULATE", width=10, command=self.controller.on_calculate)
         self.btn_add_pool = tk.Button(master=self.frm_calculation, text="+ POOL", width=10, command=self.controller.on_add_pool)
-        self.btn_del_pool = tk.Button(master=self.frm_calculation, text="- POOL", width=10, command=self.controller.on_del_pool)
+        self.btn_deck_info = tk.Button(master=self.frm_calculation, text="DECK INFO", width=10, command=self.controller.on_deck_info)
         self.btn_clear = tk.Button(master=self.frm_calculation, text="CLEAR", width=10, command=self.on_clear)
 
         # Arrange everything.
@@ -238,7 +250,7 @@ class View(tk.Tk, Observer):
 
         self.btn_calculate.grid(row=1, column=2, padx=4, pady=5, sticky="e")
         self.btn_add_pool.grid(row=2, column=0, padx=4, pady=5, sticky="w")
-        self.btn_del_pool.grid(row=2, column=1, padx=4, pady=5, sticky="w")
+        self.btn_deck_info.grid(row=2, column=1, padx=4, pady=5, sticky="w")
         self.btn_clear.grid(row=2, column=2, padx=4, pady=5, sticky="w")
         
         
@@ -257,7 +269,7 @@ class View(tk.Tk, Observer):
         self.mainloop()
         
     # Update functions.
-    def update(self, update_event, index = None, card_name = None):
+    def update(self, update_event, index = None, card_count = None, card_name = None):
         '''
         Updates the View class when something happend.
         update_event specifies which part of the display shoul be updated.
@@ -271,25 +283,35 @@ class View(tk.Tk, Observer):
         elif update_event == "del pool":                      # Deletes the last pool in the pool list.
             
             if self.pool_list != []:
-                self.pool_list[-1].get_frame().destroy()      # Deletes the display of the card pool.
-                self.pool_list.pop(-1)                        # Deletes the card pool entirely.
+                self.pool_list[index].get_frame().destroy()      # Deletes the display of the card pool.
+                self.pool_list.pop(index)                        # Deletes the card pool entirely.
+
+                for pool in self.pool_list:                      # Correct all the indexes from the pools.
+                    pool.set_index()
+                    pool.get_frame().grid_forget()
+
+                for pool in self.pool_list:
+                    index = pool.get_index()
+                    if (index % 2) == 0:                   # Place the pool in the frame depending on the length of self.pool_list.
+                        pool.get_frame().grid(row=(index // 2), column=0, padx=5, pady=5, sticky="nw")
+                    else:
+                        pool.get_frame().grid(row=(index // 2), column=1, padx=5, pady=5, sticky="nw")
 
         elif update_event == "add card to pool":              # Card was added to a pool.
 
             for pool in self.pool_list:                                         # Update list for add (cards that are not in any pool).
                pool.get_drp_add_card().remove_item(card_name)                   # Must be done for every card pool!
             self.pool_list[index].get_drp_del_card().append_item(card_name)     # Update list for delete (cards that are in the pool).
-            self.pool_list[index].add_card(card_name)                           # Update the pool display.
+            self.pool_list[index].add_card([card_count, card_name])             # Update the pool display.
 
         elif update_event == "removed card from pool":        # Remove a card from the pool.
 
             for pool in self.pool_list:                                         # Update list for add (cards that are not in any pool).
                 pool.get_drp_add_card().append_item(card_name)                  # Must be done for every card pool!
             self.pool_list[index].get_drp_del_card().remove_item(card_name)     # Update list for delete (cards that are in the pool).
-            self.pool_list[index].del_card(card_name)                           # Update the pool display.
+            self.pool_list[index].del_card(card_count, card_name)               # Update the pool display.
 
         elif update_event == "start calculate":               # The calculation will start, read all data.
-
             sample_size = self.ent_sample_size.get()                            # Get the correct sample_size.
             deck_size= self.model.get_deck_manager().get_deck_size()            # Get the correct deck_size for checking if sample_size is valid.
 
@@ -306,17 +328,27 @@ class View(tk.Tk, Observer):
             self.model.get_deck_manager().set_sample_size(int(sample_size))     # Set the sample_size in the model.
             
             for index in range(len(self.pool_list)):                            # Because the sample_size changed, all slot_sizes of the pools must be updated.
-                min_size = self.pool_list[index].get_min_size()    
+                min_in_sample = self.pool_list[index].get_min_in_sample()    
 
-                if min_size == '':                                              # If the user did not enter anything, set to 0.
-                    self.pool_list[index].set_min_size(0)
-                    min_size = 0
+                if min_in_sample == '':                                         # If the user did not enter anything, set to 0.
+                    self.pool_list[index].set_min_in_sample(0)
+                    min_in_sample = 0
 
-                elif int(min_size) > int(sample_size):                          # If the user input for min_size is to big, change it to the sample_size.
+                elif int(min_in_sample) > int(sample_size):                          # If the user input too big, change it to the sample_size.
                     self.pool_list[index].set_min_size(int(sample_size))
-                    min_size = sample_size
+                    min_in_sample = sample_size
 
-                self.model.get_deck_manager().get_pools()[index].set_slot_size(int(min_size), int(sample_size))
+                max_in_sample = self.pool_list[index].get_max_in_sample()
+
+                if max_in_sample == '' or int(max_in_sample) > int(sample_size):# If the user did not enter anything or too big, set to sample_size.
+                    self.pool_list[index].set_max_in_sample(sample_size)
+                    max_in_sample = sample_size
+
+                elif int(max_in_sample) < int(min_in_sample):                   # If max_in_sample is smaller than min_in_sample, set max_in_sample to min_in_sample.
+                    self.pool_list[index].set_max_in_sample(min_in_sample)
+                    max_in_sample = min_in_sample
+
+                self.model.get_deck_manager().get_pools()[index].set_in_sample(int(sample_size), int(min_in_sample), int(max_in_sample))
 
         elif update_event == "end calculte":                # Share the result with the user.
 

@@ -26,18 +26,18 @@ class Model_Hypgeo(Subject):
         '''
         self.notify("start calculate")                                  # Notifiy the Observers that the calculation will start, so the last parameters can be set before calculation.
         if self.deck_manager != None:                                   # Only calculates when a deck is defined.
-            slot_size_list = self.deck_manager.get_pool_slot_sizes()    # Get all possible slot_sizes of each pool.
-            combination_table = []                                      # The combination_table stores the binomial_coefficient of all possible combinations of slot_sizes.
-            for element in product(*slot_size_list):                    # product(*slot_sizes_list) is a list with sublists. Every sublist is one combinations of a slot_size from each pool. product() contains all possible combinations.
+            in_sample_list = self.deck_manager.get_pools_in_sample()    # Each pool has to be a certain times in a sample for a success. Get this infos from all pools. (min_in_sample, max_in_sample)
+            combination_table = []                                      # The combination_table stores the binomial_coefficient of all possible combinations of in_sample.
+            for element in product(*in_sample_list):                    # product(*in_samples_list) is a list with sublists. Every sublist is one combinations of a in_sample from each pool. product() contains all possible combinations.
                 size_sum = 0                                            # Requirements for one valid combination:
                 combination = list(element)                             # - Every slot must be in the combination (a size of a slot can be 0), which is ensured by product().
                 for size in combination:                            
                     size_sum += size                                
                 if size_sum <= self.deck_manager.get_sample_size():     # - All slot sizes added up must not exceed the sample_size. If a combinations is valid, it passes this if-statement.
                     index = 0                                           # index count variable which we need for accessing certain elements in pool_lists.
-                    binomial_list = []                                  # Store the binomial coefficient of each slot_size in one combination.
-                    for slot_size in combination:                       # The slot_size = we select this many cards from this pool. The binomial coeffiecent is calcualted with n = (total cards in the pool) and k = slot_size.
-                        binomial_list.append(binomial_coefficient(self.deck_manager.get_pools()[index].get_card_count(), slot_size))
+                    binomial_list = []                                  # Store the binomial coefficient of each in_sample in one combination.
+                    for in_sample in combination:                       # The in_sample = we select this many cards from this pool. The binomial coeffiecent is calcualted with n = (total cards in the pool) and k = in_sample.
+                        binomial_list.append(binomial_coefficient(self.deck_manager.get_pools()[index].get_card_count(), in_sample))
                         index += 1                                          
                     size_rest = self.deck_manager.get_sample_size() - size_sum                                                  # Maybe not all slots of the sample hand must be occupied by a pool. Here, the size of the rest slot is calculated and stored in size_rest.
                     if self.deck_manager.get_unassigned_card_count() >= size_rest:                                              # Remove invalid combinations of size_rest and the unassigned_card_count.
@@ -85,8 +85,7 @@ if __name__ == "__main__":
 
     hypgeo.get_deck_manager().add_pool()
     hypgeo.get_deck_manager().add_card_to_pool(0, 'Kashtira Fenrir')
-    hypgeo.get_deck_manager().set_pool_slot_size(0, 1)
-    hypgeo.get_deck_manager().set_pool_only_equal(0, False)
+    hypgeo.get_deck_manager().set_pool_in_sample(0, 1, 1)
 
     hypgeo.calculate()
     print(hypgeo.result)

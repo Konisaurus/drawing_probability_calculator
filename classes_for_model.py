@@ -14,7 +14,7 @@ class Pool_Manager:
     '''
     Class for managing a pool of cards. In a calculation, all cards in one pool are treated the same; they are one unit.
     '''
-    def __init__ (self, deck_manager, card_names = [], min_slot_size = 0, boolean=False):
+    def __init__ (self, deck_manager, card_names = [], min_in_sample = 0, max_in_sample = 0):
 
         # Card info for pool.
         self.card_names = card_names                          # All card names that are in the pool.
@@ -22,8 +22,8 @@ class Pool_Manager:
         self.set_card_count(deck_manager.get_main_dict())     # Set self.card_count.
 
         # Info for calculations.
-        self.min_slot_size = min_slot_size                    # How many cards of this pool should be at least in a successfull sample.
-        self.only_equal = boolean                             # True (only == self.min_slot_size is a success), False (everything >= self.min_slot_size is a success).
+        self.min_in_sample = min_in_sample                    # How many cards of this pool should be at least in a successfull sample.
+        self.max_in_sample = max_in_sample                    # The maximum number of cards of this pool which should be in a successful sample.
         self.size_list = None                                 # list of all possible sizes of a slot that is occupied by cards of this pool (also depends on sample size).
         self.set_size_list(deck_manager.get_sample_size())    # Set self.size_list.
 
@@ -42,19 +42,16 @@ class Pool_Manager:
                 count += main_dict[key]
             self.card_count = count
         
-    def set_slot_size(self, min_slot_size, sample_size):
+    def set_in_sample(self, sample_size, min_in_sample=None, max_in_sample=None):
         '''
-        Sets the value of self.min_slot_size.
+        Sets the value of self.min_in_sample and/or self.max_in_sample.
         '''
-        self.min_slot_size = min_slot_size
-        self.set_size_list(sample_size)     # Update self.size_list, because it depends on self.min_slot_size.
+        if min_in_sample != None:
+            self.min_in_sample = min_in_sample
+        if max_in_sample != None:
+            self.max_in_sample = max_in_sample
 
-    def set_only_equal(self, boolean, sample_size):
-        '''
-        Sets the value of self.only_equal.
-        '''
-        self.only_equal = boolean
-        self.set_size_list(sample_size)     # Update self.size_list, because it depends on self.only_equal.
+        self.set_size_list(sample_size)     # Update self.size_list, because it depends on self.min_slot_size.
 
     def set_size_list(self, sample_size):
         '''
@@ -63,11 +60,7 @@ class Pool_Manager:
         Only when the amount of cards of this pool in sample hand corresponds with one element of the size list, the sample hand is treated as an success.
         '''
         self.size_list = []
-        if self.only_equal == True:                 # When only one slot size is accepted, then the size_list only contains this one size.
-            self.size_list = [self.min_slot_size]
-            
-        else:                                       # Other wise, the smallest size is determined by self.min_slot_size, the maximum by min(self.card_count, sample_size).
-            self.size_list =  list(range(self.min_slot_size, min(self.card_count, sample_size) + 1))
+        self.size_list = list(range(self.min_in_sample, min(self.card_count, self.max_in_sample, sample_size) + 1))
 
     # Managing cards.
     def add_card(self, card_name, main_dict, sample_size):
@@ -167,18 +160,11 @@ class Deck_Manager:
         self.unassigned_card_count = unassigned_card_count
 
     # Access setter functions of a pool.
-    def set_pool_slot_size(self, index, min_slot_size):
+    def set_pool_in_sample(self, index, min_in_sample, max_in_sample):
         '''
         Sets self.min_slot_size of the pool in self.defined_pool_list with index.
         '''
-        self.defined_pools[index].set_slot_size(min_slot_size, self.sample_size)
-
-    def set_pool_only_equal(self, index, boolean):
-        '''
-        sets self.only_equal of the pool in self.defined_pool_list with index.
-        '''
-        self.defined_pools[index].set_only_equal(boolean, self.sample_size)
-        self.model.notify("changed only equal", index)                       # Use notify() method of model, because this change is noticable in the View class.
+        self.defined_pools[index].set_in_sample(self.sample_size, min_in_sample, max_in_sample)
 
     # Managing cards and pools.
     def add_pool(self):
@@ -188,44 +174,46 @@ class Deck_Manager:
         self.defined_pools.append(copy.deepcopy(Pool_Manager(self)))
         self.model.notify("add pool")                                        # Use notify() method of model, because this change is noticable in the View class.
 
-    def del_pool(self):
+    def del_pool(self, index):
         '''
         Deletes the newest card pool.
         '''
         if self.defined_pools != []:
-            pool = self.defined_pools[-1]
+            pool = self.defined_pools[index]
             for card in pool.get_card_names():
                 pool.del_card(card, self.main_dict, self.sample_size)
                 
-            self.defined_pools.pop(-1)
+            self.defined_pools.pop(index)
             self.set_unassigned_cards()
-            self.model.notify("del pool")
+            self.model.notify("del pool", index)
 
-    def add_card_to_pool(self, index, card_name):
+    def add_card_to_pool(self, pool_index, card_name):
         '''
         Adds a card_name to a pool in self.defined_pools with index.
         '''
-        self.defined_pools[index].add_card(card_name, self.main_dict, self.sample_size)
+        self.defined_pools[pool_index].add_card(card_name, self.main_dict, self.sample_size)
 
-        self.set_unassigned_cards()                                          # Update self.unassigned_cards, because we assigned a card.
+        self.set_unassigned_cards()                                                     # Update self.unassigned_cards, because we assigned a card.
 
-        self.model.notify("add card to pool", index, card_name)              # Use notify() method of model, because this change is noticable in the View class.
+        card_count = self.main_dict[card_name]
+        self.model.notify("add card to pool", pool_index, card_count, card_name)        # Use notify() method of model, because this change is noticable in the View class.
 
-    def del_card_in_pool(self, index, card_name):
+    def del_card_in_pool(self, pool_index, card_name):
         '''
         Removes a card_name from a pool in self.defined_pools with index.
         '''
-        self.defined_pools[index].del_card(card_name, self.main_dict, self.sample_size)
+        self.defined_pools[pool_index].del_card(card_name, self.main_dict, self.sample_size)
 
-        self.set_unassigned_cards()                                         # Update self.unassigned_cards, because we unassigned a card.
+        self.set_unassigned_cards()                                                     # Update self.unassigned_cards, because we unassigned a card.
 
-        self.model.notify("removed card from pool", index, card_name)       # Use notify() method of model, because this change is noticable in the View class.
+        card_count = self.main_dict[card_name]
+        self.model.notify("removed card from pool", pool_index, card_count, card_name)  # Use notify() method of model, because this change is noticable in the View class.
 
     # Getter functions.
     def get_model(self):
         return self.model
     
-    def get_pool_slot_sizes(self):
+    def get_pools_in_sample(self):
         '''
         Get a list with all possible slot sizes of each pool (also lists) and return it.
         '''
