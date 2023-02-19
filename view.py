@@ -244,14 +244,14 @@ class View(tk.Tk, Observer):
 
         # Arrange everything.
         lbl_initialize_calculation.grid(row=0, column=0, columnspan = 3, padx=4, pady=10, sticky="w")
-        lbl_sample_size.grid(row=1, column=0, padx=4, pady=4, sticky="w")
+        lbl_sample_size.grid(row=2, column=0, padx=4, pady=4, sticky="w")
 
-        self.ent_sample_size.grid(row=1, column=1, padx=4, pady=4)
+        self.ent_sample_size.grid(row=2, column=1, padx=4, pady=4)
 
-        self.btn_calculate.grid(row=1, column=2, padx=4, pady=5, sticky="e")
-        self.btn_add_pool.grid(row=2, column=0, padx=4, pady=5, sticky="w")
-        self.btn_deck_info.grid(row=2, column=1, padx=4, pady=5, sticky="w")
-        self.btn_clear.grid(row=2, column=2, padx=4, pady=5, sticky="w")
+        self.btn_calculate.grid(row=2, column=2, padx=4, pady=5, sticky="e")
+        self.btn_add_pool.grid(row=1, column=0, padx=4, pady=5, sticky="w")
+        self.btn_deck_info.grid(row=1, column=1, padx=4, pady=5, sticky="w")
+        self.btn_clear.grid(row=1, column=2, padx=4, pady=5, sticky="w")
         
         
         
@@ -459,8 +459,8 @@ class View(tk.Tk, Observer):
         if key == "Select deck.":
             self.on_clear()
         else:
-            for i in range(len(self.pool_list)):            # Remove all displays from the old deck.
-                self.controller.on_del_pool()
+            for index in range(len(self.pool_list)):        # Remove all displays from the old deck.
+                self.controller.on_del_pool(index)
             self.controller.on_set_deck_manager(key)        # Set new deck.
 
     def error_popup(self, text):
