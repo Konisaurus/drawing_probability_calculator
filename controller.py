@@ -110,18 +110,18 @@ class Controller:
         '''
         Assigns a card to a pool.
         '''
-        if card_name == "Select card.":     # Nothing is selected, do nothing.
+        if card_name == "Select card to add.": # Nothing is selected, do nothing.
             pass
-        else:                               # Assign the selected card.
+        else:                                  # Assign the selected card.
             self.model.get_deck_manager().add_card_to_pool(index, card_name)
 
     def on_del_card(self, index, card_name):
         '''
         Unassigns a card from a pool.
         '''
-        if card_name == "Select card.":     # Nothing is selected, do nothing.
+        if card_name == "Select card to add.": # Nothing is selected, do nothing.
             pass
-        else:                               # Assign the selected card.
+        else:                                  # Assign the selected card.
             self.model.get_deck_manager().del_card_in_pool(index, card_name)
 
     # Other event handlers.

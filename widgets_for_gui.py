@@ -42,6 +42,12 @@ class Changeable_OptionMenu():
             self.options.remove(item)               
             self.update_options()                                           # Update OptionMenu.
 
+    # Setter functions.
+    def set_options(self, option_list):
+        self.options = [self.unremovable_option]
+        self.options.extend(option_list)
+        self.update_options()
+
     # Getter functions.
     def get_OptionMenu_class(self):
         return self.option_menu

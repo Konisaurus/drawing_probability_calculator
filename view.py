@@ -32,30 +32,29 @@ class Pool_Section:
         self.index = index      # Index where this pool in the pool_list of the master window is stored.
 
         # Frame for the card pool display.
-        self.frame = tk.Frame(master=self.view.get_frm_bottom(), relief=tk.RIDGE, borderwidth=5, width=30)
+        self.frame = tk.Frame(master=self.view.get_frm_bottom(), relief=tk.RIDGE, borderwidth=5)
 
         # Display all cards in the pool.
-        self.card_names = []
-        self.lbl_card_display = tk.Label(master=self.frame, text="text", width=50, anchor="nw", justify="left")
-        self.set_card_display_text()
+        self.card_names = {}
+        self.del_buttons = {}
+        self.frm_card_display = tk.Frame(master=self.frame, relief=tk.FLAT, borderwidth=0)
+        lbl_title_display = tk.Label(master=self.frm_card_display, text="Cards in pool:", font=("Helvetica", "9", "bold"), anchor="nw", justify="left")
+        self.set_pool_display()
 
         # Labels.
-        lbl_title = tk.Label(master=self.frame, text="Card Pool", height=1, width=42, font=("Helvetica", "11", "bold"), anchor="nw")
-        lbl_add_card = tk.Label(master=self.frame, text="Add card:", anchor="nw")
-        lbl_del_card = tk.Label(master=self.frame, text="Delete card:", anchor="nw")
-        lbl_in_sample = tk.Label(master=self.frame, text="In sample (success):", anchor="nw", width=15)
+        self.lbl_title = tk.Label(master=self.frame, text=("Card Pool " + str(self.index + 1)), height=1, width=42, font=("Helvetica", "11", "bold"), anchor="nw")
+        lbl_place_holder = tk.Label(master=self.frame, text=" ")
+        lbl_in_sample = tk.Label(master=self.frame, text="Cards from pool in successfull sample:", anchor="nw", width=29)
         lbl_min = tk.Label(master=self.frame, text="min.", anchor="nw", width=3)
-        lbl_bewtween = tk.Label(master=self.frame, text="-", anchor="nw", width=2)
+        lbl_bewtween = tk.Label(master=self.frame, text="-", anchor="nw")
         lbl_max = tk.Label(master=self.frame, text="max.", anchor="nw", width=4)
 
         # Dropdownlists.
-        self.drp_add_card = Changeable_OptionMenu(self.frame, "Select card.", self.view.get_model().get_deck_manager().get_unassigned_cards(), 22)
-        self.drp_del_card = Changeable_OptionMenu(self.frame, "Select card.", [], 22)
+        self.drp_add_card = Changeable_OptionMenu(self.frame, "Select card to add.", self.view.get_model().get_deck_manager().get_unassigned_cards(), 40)
 
         # Buttons.
         self.btn_add_card = tk.Button(master=self.frame, text="+ CARD", width=10, command=lambda: self.view.get_controller().on_add_card(self.index, self.drp_add_card.get_variable_value()))
-        self.btn_del_card = tk.Button(master=self.frame, text="- CARD", width=10, command=lambda: self.view.get_controller().on_del_card(self.index, self.drp_del_card.get_variable_value()))
-        self.btn_del_pool = tk.Button(master=self.frame, text="- POOL", width=10, command=lambda: self.view.get_controller().on_del_pool(self.index))
+        self.btn_del_pool = tk.Button(master=self.frame, text="x", width=2, font=("Helvetica", "9", "bold"), command=lambda: self.view.get_controller().on_del_pool(self.index))
 
         # Entries.
         self.ent_min_in_sample = tk.Entry(master=self.frame, width=3, validate="key", justify="right")
@@ -64,25 +63,23 @@ class Pool_Section:
         self.ent_max_in_sample.configure(validatecommand=(self.ent_min_in_sample.register(self.view.validate),'%d', '%P'))
 
         # Arrange everything.
-        self.lbl_card_display.grid(row=1, column=0, columnspan=7, padx=4, pady=4, sticky="nw")
+        self.frm_card_display.grid(row=1, column=0, columnspan=6, padx=0, pady=0, sticky="nw")
+        lbl_title_display.grid(row=0, column=0, columnspan=6, padx=4, pady=4, sticky="nw")
 
-        lbl_title.grid(row=0, column=0, columnspan=7, padx=4, pady=10, sticky="w")
-        lbl_add_card.grid(row=2, column=0, padx=4, pady=4, sticky="w")
-        lbl_del_card.grid(row=3, column=0, padx=4, pady=4, sticky="w")
+        self.lbl_title.grid(row=0, column=0, columnspan=6, padx=4, pady=10, sticky="w")
+        lbl_place_holder.grid(row=2, column=0, columnspan=6)
         lbl_in_sample.grid(row=4, column=0, padx=4, pady=4, sticky="w")
-        lbl_min.grid(row=4, column=1, pady=4, sticky="e")
+        lbl_min.grid(row=4, column=1, pady=4, sticky="w")
         lbl_bewtween.grid(row=4, column=3, pady=4, sticky="e")
         lbl_max.grid(row=4, column=4, pady=4, sticky="e")
 
-        self.drp_add_card.get_OptionMenu_class().grid(row=2, column=1, columnspan=5, padx=4, pady=4, sticky="w")
-        self.drp_del_card.get_OptionMenu_class().grid(row=3, column=1, columnspan=5, padx=4, pady=4, sticky="w")
+        self.drp_add_card.get_OptionMenu_class().grid(row=3, column=0, columnspan=3, padx=4, pady=4, sticky="w")
 
-        self.btn_add_card.grid(row=2, column=6, padx=4, pady=4, sticky="w")
-        self.btn_del_card.grid(row=3, column=6, padx=4, pady=4, sticky="w")
-        self.btn_del_pool.grid(row=4, column=6, padx=4, pady=4, sticky="w")
+        self.btn_add_card.grid(row=3, column=3, columnspan=3, padx=4, pady=4)
+        self.btn_del_pool.grid(row=0, column=5, pady=4, sticky="w")
 
-        self.ent_min_in_sample.grid(row=4, column=2, padx=4, pady=4, sticky="w")
-        self.ent_max_in_sample.grid(row=4, column=5, padx=4, pady=4, sticky="w")
+        self.ent_min_in_sample.grid(row=4, column=2, pady=4, sticky="w")
+        self.ent_max_in_sample.grid(row=4, column=5, pady=4, sticky="w")
         
     # Setter functions.
     def set_index(self):
@@ -90,19 +87,20 @@ class Pool_Section:
         Sets the index. Can only be used when the "Pool_Section" is appended to a list.
         '''
         self.index = self.view.get_pool_list().index(self)
+        title = "Card Pool " + str(self.index + 1)
+        self.lbl_title.config(text=title)
 
-    def set_card_display_text(self):
+    def set_pool_display(self):
         '''
         Sets the card display of the "Pool Section".
         '''
-        text_list = "Cards in pool: \n\n"
-        if self.card_names != []:                   
-            for card in self.card_names:                            # Every card should be listed on a new line.
-                text_list += str(card[0]) + "x " + card[1] + "\n"
-        else:                                                       # If there are no cards in this pool, state this.
-            text_list += "No cards added."
-
-        self.lbl_card_display.config(text=text_list)
+        self.frm_card_display.grid_forget()
+        row = 1
+        for key in self.card_names:
+            self.card_names[key].grid(row=row, column=1, padx=4, pady=4, sticky="w")
+            self.del_buttons[key].grid(row=row, column=0, padx=4, pady=4, sticky="w")
+            row += 1
+        self.frm_card_display.grid(row=1, column=0, columnspan=7, padx=0, pady=0, sticky="nw")
 
     def set_min_in_sample(self, min_in_sample):
         '''
@@ -119,20 +117,23 @@ class Pool_Section:
         self.ent_max_in_sample.insert(0, max_in_sample)
         
     # Managing cards.
-    def add_card(self, card_name):
+    def add_card(self, card_count, card_name):
         '''
         Assigns a card to this pool display.
         '''
+        self.card_names[card_name] = tk.Label(master=self.frm_card_display, text=str(card_count) + "x " + card_name, width=44, anchor="nw", justify="left")
+        self.del_buttons[card_name] = tk.Button(master=self.frm_card_display, text="x", width=2, font=("Helvetica", "9", "bold"), command=lambda: self.view.get_controller().on_del_card(self.index, card_name))
+        self.set_pool_display()                    # Update the card display.
 
-        self.card_names.append(card_name)
-        self.set_card_display_text()                    # Update the card display.
-
-    def del_card(self, card_count, card_name):
+    def del_card(self, card_name):
         '''
         Unassigns a card from this pool display.
         '''
-        self.card_names.remove([card_count, card_name])
-        self.set_card_display_text()                    # Update the card display.
+        self.card_names[card_name].destroy()       # Destroy its display.
+        self.card_names.pop(card_name)             # Remove it in the card_name dictionary.
+        self.del_buttons[card_name].destroy()      # Destroy its remove button.
+        self.del_buttons.pop(card_name)            # Remove the button from the dictionary.
+        self.set_pool_display()                    # Reajust the card display.
 
     # Getter functions.
     def get_index(self):
@@ -149,9 +150,6 @@ class Pool_Section:
 
     def get_drp_add_card(self):
         return self.drp_add_card
-    
-    def get_drp_del_card(self):
-        return self.drp_del_card
 
 class View(tk.Tk, Observer):
     '''
@@ -172,7 +170,7 @@ class View(tk.Tk, Observer):
         tk.Tk.__init__(self)
         self.geometry("860x500")
         self.resizable(False, True)
-        self.title("YGO Hand Master")
+        self.title("Drawing Calculation Master")
 
         # Create two sections for the window and pack them.
         self.frm_top = tk.Frame(master=self, borderwidth=5)
@@ -283,12 +281,14 @@ class View(tk.Tk, Observer):
         elif update_event == "del pool":                      # Deletes the last pool in the pool list.
             
             if self.pool_list != []:
-                self.pool_list[index].get_frame().destroy()      # Deletes the display of the card pool.
-                self.pool_list.pop(index)                        # Deletes the card pool entirely.
+                self.pool_list[index].get_frame().destroy()                                # Deletes the display of the card pool.
+                self.pool_list.pop(index)                                                  # Deletes the card pool entirely.
 
-                for pool in self.pool_list:                      # Correct all the indexes from the pools.
+                unassigned_cards = self.model.get_deck_manager().get_unassigned_cards()    # Correct existing pools.
+                for pool in self.pool_list:                      
                     pool.set_index()
                     pool.get_frame().grid_forget()
+                    pool.get_drp_add_card().set_options(unassigned_cards)
 
                 for pool in self.pool_list:
                     index = pool.get_index()
@@ -301,15 +301,13 @@ class View(tk.Tk, Observer):
 
             for pool in self.pool_list:                                         # Update list for add (cards that are not in any pool).
                pool.get_drp_add_card().remove_item(card_name)                   # Must be done for every card pool!
-            self.pool_list[index].get_drp_del_card().append_item(card_name)     # Update list for delete (cards that are in the pool).
-            self.pool_list[index].add_card([card_count, card_name])             # Update the pool display.
+            self.pool_list[index].add_card(card_count, card_name)               # Update the pool display.
 
         elif update_event == "removed card from pool":        # Remove a card from the pool.
 
             for pool in self.pool_list:                                         # Update list for add (cards that are not in any pool).
                 pool.get_drp_add_card().append_item(card_name)                  # Must be done for every card pool!
-            self.pool_list[index].get_drp_del_card().remove_item(card_name)     # Update list for delete (cards that are in the pool).
-            self.pool_list[index].del_card(card_count, card_name)               # Update the pool display.
+            self.pool_list[index].del_card(card_name)                           # Update the pool display.
 
         elif update_event == "start calculate":               # The calculation will start, read all data.
             sample_size = self.ent_sample_size.get()                            # Get the correct sample_size.
