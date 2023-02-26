@@ -170,7 +170,7 @@ class View(tk.Tk, Observer):
         tk.Tk.__init__(self)
         self.geometry("860x500")
         self.resizable(False, True)
-        self.title("Drawing Calculation Master")
+        self.title("Drawing Probability Master")
 
         # Create two sections for the window and pack them.
         self.frm_top = tk.Frame(master=self, borderwidth=5)
@@ -415,10 +415,8 @@ class View(tk.Tk, Observer):
         (which is the key of the deck in deck_storage.json) to the deck dropdown.
         '''
         check = self.controller.on_deck_import(self.ent_deck_import.get())      # Give the value of the entry to the controller.
-        if check == True:                                                       # Controller added a new deck, so add to the display.
-            with open(self.ent_deck_import.get(), "r") as read_deck:
-                key = list(json.load(read_deck))[0]
-                self.drp_stored_decks.append_item(key)
+        if check[0] == True:                                                    # Controller added a new deck, so add to the display.
+                self.drp_stored_decks.append_item(check[1])                     # check[1] is the key for the newly added deck.
 
         elif check == "file not valid":
             self.error_popup("ERROR: file is not a valid deck.")

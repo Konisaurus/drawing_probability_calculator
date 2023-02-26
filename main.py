@@ -12,4 +12,3 @@ def main():
 # Execute the program only when this exact file is run.
 if __name__ == "__main__":
     main()
-    

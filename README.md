@@ -1,14 +1,12 @@
-# Yu-Gi-Oh! Hand Master (NOT YET FULLY IMPLEMENTED)
+# Drawing Probability Master
 
-A python algorithm for calculating the chances of drawing a sample of cards from a deck.
+A python algorithm for calculating the chance of drawing a sample of cards from a deck.
 
-Includes a GUI for setting up a desired sample hand. The deck selection has not implemented yet.
-
-Inculdes two models for calculating the probability of a sample hand:
-- model_hypgeo.py calculates the probability of a certain sample with the hypergeometric probability/cumulative 
-  distribution function.
-- model_simulation.py (NOT YET FULLY IMPLEMENTED) draws a random sample hand multiple times and counts if the sample a
-  success or not.
+It includes the following features:
+- A GUI for setting up a desired sample hand.
+- Importing/storing decks.
+- Calculating the probability of a certain cample with the hypergeometric cumulative distribution
+  function.
 
 ## Installation
 
@@ -20,11 +18,30 @@ git clone https://github.com/Konisaurus/YGO_hand_calculation.git
 
 ## Usage
 
-Run the main.py file.
+Start the program by running the main.py file.
+
+The following files can be imported as a deck:
+- .json
+
+```python
+  # Here is an example for formatting the .json file.
+  {
+    "deck name":{
+      "card A": number of copies,   # type(number of copies) = int
+      "card B": number of copies,
+      "card C": number of copies,
+      } 
+  }
+```
+- .ydk
+
+  It's a file for storing a Yu-Gi-Oh! deck. This file type is used by multiple
+  online simulators that use the API of YGOPRODeck: https://ygoprodeck.com/api-guide/
+  The card "id"s of the ydk_card_database.json are the same as in the api of YGOPRODeck.
 
 ## Contributing
 
-Pull requests are welcome for people I personally know. 
+Pull requests are welcome. 
 For major changes, please open an issue first to discuss what you would like to change.
 
 ## License
