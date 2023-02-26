@@ -13,7 +13,7 @@ It includes the following features:
 Use GIT bash [GIT](https://git-scm.com/downloads) to clone th is repository.
 
 ```bash
-git clone https://github.com/Konisaurus/YGO_hand_calculation.git
+git clone https://github.com/Konisaurus/drawing_probability_calculator.git
 ```
 
 ## Usage

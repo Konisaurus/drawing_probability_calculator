@@ -185,7 +185,7 @@ class Deck_Manager:
                 
             self.defined_pools.pop(index)
             self.set_unassigned_cards()
-            self.model.notify("del pool", index)
+            self.model.notify("del pool", index=index)
 
     def add_card_to_pool(self, pool_index, card_name):
         '''
@@ -193,10 +193,10 @@ class Deck_Manager:
         '''
         self.defined_pools[pool_index].add_card(card_name, self.main_dict, self.sample_size)
 
-        self.set_unassigned_cards()                                                     # Update self.unassigned_cards, because we assigned a card.
+        self.set_unassigned_cards()                                                                                # Update self.unassigned_cards, because we assigned a card.
 
         card_count = self.main_dict[card_name]
-        self.model.notify("add card to pool", pool_index, card_count, card_name)        # Use notify() method of model, because this change is noticable in the View class.
+        self.model.notify("add card to pool", index=pool_index, card_count=card_count, card_name=card_name)        # Use notify() method of model, because this change is noticable in the View class.
 
     def del_card_in_pool(self, pool_index, card_name):
         '''
@@ -204,10 +204,20 @@ class Deck_Manager:
         '''
         self.defined_pools[pool_index].del_card(card_name, self.main_dict, self.sample_size)
 
-        self.set_unassigned_cards()                                                     # Update self.unassigned_cards, because we unassigned a card.
+        self.set_unassigned_cards()                                                         # Update self.unassigned_cards, because we unassigned a card.
 
         card_count = self.main_dict[card_name]
-        self.model.notify("removed card from pool", pool_index, card_count, card_name)  # Use notify() method of model, because this change is noticable in the View class.
+        self.model.notify("removed card from pool", index=pool_index, card_name=card_name)  # Use notify() method of model, because this change is noticable in the View class.
+
+    def notify_deck_info(self):
+        '''
+        Get the all the important information for displaying a deck.
+        '''
+        pool_card_names = []
+        for pool in self.defined_pools:
+            pool_card_names.append(pool.get_card_names())
+        
+        self.model.notify(update_event="show deck info", deck_info=[self.main_dict, self.unassigned_cards, pool_card_names])
 
     # Getter functions.
     def get_model(self):
@@ -220,10 +230,7 @@ class Deck_Manager:
         slot_sizes = []
         for pool in self.defined_pools:                  # Get a list with all possible slot sizes of each pool.
             slot_sizes.append(pool.get_size_list())
-        return slot_sizes                               
-
-    def get_deck_name(self):
-        return self.deck_name
+        return slot_sizes
 
     def get_main_dict(self):
         return self.main_dict

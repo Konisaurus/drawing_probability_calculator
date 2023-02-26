@@ -267,19 +267,20 @@ class View(tk.Tk, Observer):
         self.mainloop()
         
     # Update functions.
-    def update(self, update_event, index = None, card_count = None, card_name = None):
+    def update(self, update_event, **kwargs):
         '''
         Updates the View class when something happend.
         update_event specifies which part of the display shoul be updated.
         index, card_name are optional and only need for certain update_events.
         '''
-    
+
         if update_event == "add pool":                        # Create a new pool and add it to the pool list.
 
             self.add_pool_display()
 
         elif update_event == "del pool":                      # Deletes the last pool in the pool list.
-            
+            index = kwargs["index"]
+
             if self.pool_list != []:
                 self.pool_list[index].get_frame().destroy()                                # Deletes the display of the card pool.
                 self.pool_list.pop(index)                                                  # Deletes the card pool entirely.
@@ -297,19 +298,24 @@ class View(tk.Tk, Observer):
                     else:
                         pool.get_frame().grid(row=(index // 2), column=1, padx=5, pady=5, sticky="nw")
 
-        elif update_event == "add card to pool":              # Card was added to a pool.
+        elif update_event == "add card to pool":           # Card was added to a pool.
+            index = kwargs["index"]
+            card_count = kwargs["card_count"]
+            card_name = kwargs["card_name"]
 
             for pool in self.pool_list:                                         # Update list for add (cards that are not in any pool).
-               pool.get_drp_add_card().remove_item(card_name)                   # Must be done for every card pool!
+               pool.get_drp_add_card().set_options(self.model.get_deck_manager().get_unassigned_cards())
             self.pool_list[index].add_card(card_count, card_name)               # Update the pool display.
 
-        elif update_event == "removed card from pool":        # Remove a card from the pool.
+        elif update_event == "removed card from pool":     # Remove a card from the pool.
+            index = kwargs["index"]
+            card_name = kwargs["card_name"]
 
             for pool in self.pool_list:                                         # Update list for add (cards that are not in any pool).
-                pool.get_drp_add_card().append_item(card_name)                  # Must be done for every card pool!
+                pool.get_drp_add_card().set_options(self.model.get_deck_manager().get_unassigned_cards())                  
             self.pool_list[index].del_card(card_name)                           # Update the pool display.
 
-        elif update_event == "start calculate":               # The calculation will start, read all data.
+        elif update_event == "start calculate":            # The calculation will start, read all data.
             sample_size = self.ent_sample_size.get()                            # Get the correct sample_size.
             deck_size= self.model.get_deck_manager().get_deck_size()            # Get the correct deck_size for checking if sample_size is valid.
 
@@ -333,7 +339,7 @@ class View(tk.Tk, Observer):
                     min_in_sample = 0
 
                 elif int(min_in_sample) > int(sample_size):                          # If the user input too big, change it to the sample_size.
-                    self.pool_list[index].set_min_size(int(sample_size))
+                    self.pool_list[index].set_min_in_sample(int(sample_size))
                     min_in_sample = sample_size
 
                 max_in_sample = self.pool_list[index].get_max_in_sample()
@@ -348,7 +354,7 @@ class View(tk.Tk, Observer):
 
                 self.model.get_deck_manager().get_pools()[index].set_in_sample(int(sample_size), int(min_in_sample), int(max_in_sample))
 
-        elif update_event == "end calculte":                # Share the result with the user.
+        elif update_event == "end calculte":               # Share the result with the user.
 
             popup_result = tk.Toplevel()                                        # Create a popup window.
             popup_result.geometry("390x70")                                     # Set size.
@@ -369,8 +375,10 @@ class View(tk.Tk, Observer):
 
             popup_result.mainloop()
 
-        elif update_event == "changed only equal":            # Change the pool type display.
-            self.pool_list[index].set_pool_type()
+        elif update_event == "show deck info":             # Open a new window that shows the relevant information of the deck.
+            deck_info = kwargs["deck_info"]
+
+            pass
 
     # Managing pools.
     def add_pool_display(self):
@@ -430,10 +438,11 @@ class View(tk.Tk, Observer):
         Depending on the actions of the deck controller, delete a deck name 
         (which is the key of the deck in deck_storage.json) from the deck dropdown.
         '''
-        check = self.controller.on_deck_delete(self.drp_stored_decks.get_variable_value())
+        key = self.drp_stored_decks.get_variable_value()
+        check = self.controller.on_deck_delete(key)
 
         if check == True:
-            self.drp_stored_decks.update_options()
+            self.drp_stored_decks.remove_item(key)
 
     def validate(self, type_of_action, entry_value):
         '''

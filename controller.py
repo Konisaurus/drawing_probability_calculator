@@ -34,7 +34,6 @@ class Controller:
                         return "file not valid"
                     
                 if path[-4:] == ".ydk":                    # Handle .ydk files
-                    print("here")
                     ydk = read_deck.read()                 # Read the ydk file.
                     try:
                         deck = self.convert_ydk(ydk, path) # Only a valid .ydk file can be converted
@@ -85,10 +84,9 @@ class Controller:
         '''
         Opens an extra window that shows the entire deck with
         neccessary information about each card.
-
-        NOT YET IMPLEMENTED
         '''
-        pass
+        if self.validate_deck():
+            self.model.get_deck_manager().notify_deck_info()
 
     def on_clear(self):
         '''
@@ -182,7 +180,7 @@ class Controller:
             except:
                 temp_main_dict[element] = 1
 
-        with open(r"C:\Users\konra\Documents\coding private\Pyhton\YGO_hand_calculation\ydk_card_database.json", "r") as read_database:
+        with open("ydk_card_database.json", "r") as read_database:
             database = json.load(read_database)
 
         main_dict = {}                                      # Create a dict = {"name": "number of copies", ...}

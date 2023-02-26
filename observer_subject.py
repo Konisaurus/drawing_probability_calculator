@@ -34,11 +34,11 @@ class Subject():
         '''
         self.observers.add(observer)
 
-    def notify(self, update_event, *args):
+    def notify(self, update_event, **kwargs):
         '''
         Notifiy all Observers about a change.
         update_event further specifies what exactly changed.
         *args for arguments that are important in combination with the change.
         '''
         for observer in self.observers:
-            observer.update(update_event, *args)
+            observer.update(update_event, **kwargs)
