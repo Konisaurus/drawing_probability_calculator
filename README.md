@@ -5,7 +5,7 @@ A python algorithm for calculating the chance of drawing a sample of cards from 
 It includes the following features:
 - A GUI for setting up a desired sample hand.
 - Importing/storing decks.
-- Calculating the probability of a certain cample with the hypergeometric cumulative distribution
+- Calculating the probability of a certain sample with the hypergeometric cumulative distribution
   function.
 
 ## Installation
@@ -36,8 +36,8 @@ The following files can be imported as a deck:
 - .ydk
 
   It's a file for storing a Yu-Gi-Oh! deck. This file type is used by multiple
-  online simulators that use the API of YGOPRODeck: https://ygoprodeck.com/api-guide/
-  The card "id"s of the ydk_card_database.json are the same as in the api of YGOPRODeck.
+  online simulators that use the [API of YGOPRODeck](https://ygoprodeck.com/api-guide/).
+  The card "id"s of the ydk_card_database.json are the same as in the API.
 
 ## Contributing
 
