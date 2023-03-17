@@ -62,7 +62,7 @@ class Changeable_OptionMenu():
 class Scrollable_Frame():
     '''
     Frame with a scrollbar for the y-axis.
-    Access this frame with self.get_frame().
+    Access the container with self.get_frm_container().
     '''
     def __init__(self, master):
         # Create a frame that wraps everything up.
@@ -70,7 +70,7 @@ class Scrollable_Frame():
 
         # Create a canvas which will be scrollable.
         self.cnv_scrollbar = tk.Canvas(master=self.frm_wrapper)
-        self.cnv_scrollbar.pack(side=tk.LEFT,fill=tk.BOTH,expand=1)
+        self.cnv_scrollbar.pack(side="left", fill="both",expand=1)
 
         # Add a scrollbar to the canvas.
         self.scb_yaxis = tk.Scrollbar(master=self.frm_wrapper, orient="vertical", command=self.cnv_scrollbar.yview)
@@ -95,10 +95,13 @@ class Scrollable_Frame():
         '''
         self.frm_wrapper.pack(fill="both",expand=1, anchor="nw")
 
-    
-    def get_frame(self):
+    def get_frm_wrapper(self):
         '''
-        # Access/add all widgets in this frame.
+        Access the wrapper frame, for placing it, etc.
+        '''
+    def get_frm_container(self):
+        '''
+        Access/add all widgets in this frame.
         '''
         return self.frm_container
         

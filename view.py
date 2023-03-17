@@ -150,6 +150,53 @@ class Pool_Section:
 
     def get_drp_add_card(self):
         return self.drp_add_card
+    
+
+class Deck_Info(tk.Toplevel):
+    '''
+    Class that shows general information about the deck.
+    '''
+    def __init__(self, view, info):
+
+        tk.Toplevel.__init__(self)
+        self.view = view
+        self.set_position()
+        self.frm_scb = Scrollable_Frame(self)
+        self.frm_design = tk.Frame(master=self.frm_scb.get_frm_container(), relief=tk.RIDGE, borderwidth=5)
+        self.info = info
+
+        # Labels.
+        self.lbl_title = tk.Label(master=self.frm_design, text="Deck Info", height=1, width=38, font=("Helvetica", "11", "bold"), anchor="w")
+        self.lbl_deck = tk.Label(master=self.frm_design, text=" ", width=38, anchor="w", justify="left")
+        self.set_lbl_deck()
+
+        # Arrange everything.
+        self.frm_scb.pack()
+        self.frm_design.pack()
+        self.lbl_title.grid(row=0, column=0,padx=4, pady=4)
+        self.lbl_deck.grid(row=1, column=0, padx=4, pady=4, sticky="w")
+
+        # Run the window.
+        self.protocol("WM_DELETE_WINDOW", lambda : self.view.get_btn_deck_info().configure(state='normal') or self.destroy())   # Enable button when closed.
+        self.mainloop()
+
+    def set_position(self):
+        self.geometry("405x500")
+        self.resizable(False, True)                                     # Lock size.
+        position_y = self.view.winfo_y()                                # Window y coordinate.
+        position_x = self.view.winfo_x() + self.view.winfo_width() + 20 # Window x coordinate
+        if position_x + 405>= self.winfo_screenwidth():  # Check if the window is outside of the screen.
+            position_x = self.view.winfo_x()
+
+        self.geometry("+%d+%d" %(position_x, position_y))               # Place window.
+    
+    def set_lbl_deck(self):
+        deck = self.info[0]
+        text = "\n"
+        for key in deck.keys():
+            text += str(deck[key]) + "x " + key + "\n"
+        self.lbl_deck.config(text = text)
+
 
 class View(tk.Tk, Observer):
     '''
@@ -157,7 +204,7 @@ class View(tk.Tk, Observer):
     '''
     def __init__(self, model, controller):
         
-        # Interaction with the model, the storage and the controller.
+        # Interaction with the model and the controller.
 
         self.model = model              # Which model should be observed.
         self.model.attach(self)         # Attach to this model.
@@ -255,9 +302,10 @@ class View(tk.Tk, Observer):
         
         ###################################################################################################################################################
 
-        # Pool section.
+        # Storing other displayes inside of View.
         
-        self.pool_list = []     # Store all pools that were created.
+        self.pool_list = []                 # Store all pools that were created.
+        self.deck_info_toplevel = None      # Store the deck_info window.
         
         ###################################################################################################################################################
 
@@ -376,9 +424,10 @@ class View(tk.Tk, Observer):
             popup_result.mainloop()
 
         elif update_event == "show deck info":             # Open a new window that shows the relevant information of the deck.
-            deck_info = kwargs["deck_info"]
-
-            pass
+            info = kwargs["deck_info"]
+            
+            self.btn_deck_info.configure(state='disabled') # Disable the button, so only one deck_info window can be oppend.
+            self.deck_info_toplevel = Deck_Info(self, info)
 
     # Managing pools.
     def add_pool_display(self):
@@ -405,7 +454,10 @@ class View(tk.Tk, Observer):
         return self.pool_list
 
     def get_frm_bottom(self):
-        return self.scb_frm_bottom.get_frame()
+        return self.scb_frm_bottom.get_frm_container()
+    
+    def get_btn_deck_info(self):
+        return self.btn_deck_info
 
     # Other functions.
     def on_clear(self):
@@ -464,9 +516,15 @@ class View(tk.Tk, Observer):
         if key == "Select deck.":
             self.on_clear()
         else:
-            for index in range(len(self.pool_list)):        # Remove all displays from the old deck.
+            for index in range(len(self.pool_list)-1, -1, -1):  # Remove all displays from the old deck.
                 self.controller.on_del_pool(index)
-            self.controller.on_set_deck_manager(key)        # Set new deck.
+            self.controller.on_set_deck_manager(key)            # Set new deck.
+
+    def deck_info_closed_callback(self):
+        '''
+        Enables "DECK INFO" button
+        '''
+        self.btn_deck_info.configure(state='normal')
 
     def error_popup(self, text):
             popup_error = tk.Toplevel()                                         # Create a popup window.
